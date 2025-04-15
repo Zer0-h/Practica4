@@ -46,14 +46,27 @@ public class Controlador implements Notificar {
             File sortida = new File("comprés.txt");
             servei.comprimir(contingut, sortida);
             model.setFitxerComprès(sortida);
+            vista.getPanellArbre().setArrel(model.getArrelHuffman());
+            vista.getPanellArbre().repaint();
         } catch (Exception e) {
             vista.mostrarMissatge("Error durant la compressió.");
         }
     }
 
     public void descomprimir() {
-        // Es pot implementar més endavant
-        vista.mostrarMissatge("Funcionalitat de descompressió encara no implementada.");
+        if (model.getFitxerComprès() == null) {
+            vista.mostrarMissatge("Has de comprimir o carregar un fitxer .huff primer.");
+            return;
+        }
+
+        File fitxerDescomprès = new File("descomprès.txt");
+        try {
+            servei.descomprimir(model.getFitxerComprès(), fitxerDescomprès);
+            model.setFitxerDescomprès(fitxerDescomprès);
+            vista.mostrarMissatge("Fitxer descomprimit correctament.");
+        } catch (Exception e) {
+            vista.mostrarMissatge("Error durant la descompressió.");
+        }
     }
 
     public void guardarFitxer() {
@@ -97,6 +110,10 @@ public class Controlador implements Notificar {
             notificar(Notificacio.ERROR);
             vista.mostrarMissatge("Error durant el test de fidelitat.");
         }
+    }
+
+    public Model getModel() {
+        return model;
     }
 
     @Override

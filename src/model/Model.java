@@ -9,6 +9,7 @@ public class Model {
     private File fitxerOriginal;
     private File fitxerComprès;
     private File fitxerDescomprès;
+    private NodeHuffman arrelHuffman;
 
     public File getFitxerOriginal() {
         return fitxerOriginal;
@@ -32,5 +33,13 @@ public class Model {
 
     public void setFitxerDescomprès(File fitxerDescomprès) {
         this.fitxerDescomprès = fitxerDescomprès;
+    }
+
+    public NodeHuffman getArrelHuffman() {
+        return arrelHuffman;
+    }
+
+    public void setArrelHuffman(NodeHuffman arrelHuffman) {
+        this.arrelHuffman = arrelHuffman;
     }
 }

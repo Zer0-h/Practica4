@@ -6,15 +6,13 @@ import vista.Vista;
 
 import javax.swing.*;
 import java.io.File;
+import model.Model;
 
 public class Controlador implements Notificar {
 
+    private Model model;
     private ServeiCompressio servei;
     private Vista vista;
-
-    private File fitxerOriginal;
-    private File fitxerComprès;
-    private File fitxerDescomprès;
 
     public static void main(String[] args) {
         new Controlador().inicialitzar();
@@ -23,29 +21,31 @@ public class Controlador implements Notificar {
     public void inicialitzar() {
         this.servei = new ServeiCompressio(this);
         this.vista = new Vista(this);
+        this.model = new Model();
         this.vista.mostrar();
     }
 
     public void carregarFitxer() {
         JFileChooser selector = new JFileChooser();
-        int resultat = selector.showOpenDialog(null);
-        if (resultat == JFileChooser.APPROVE_OPTION) {
-            fitxerOriginal = selector.getSelectedFile();
-            vista.mostrarMissatge("Fitxer carregat: " + fitxerOriginal.getName());
+        if (selector.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+            File fitxer = selector.getSelectedFile();
+            model.setFitxerOriginal(fitxer);
+            vista.mostrarMissatge("Fitxer carregat: " + fitxer.getName());
             notificar(Notificacio.FITXER_CARREGAT);
         }
     }
 
     public void comprimir() {
-        if (fitxerOriginal == null) {
+        if (model.getFitxerOriginal() == null) {
             vista.mostrarMissatge("Primer has de carregar un fitxer.");
             return;
         }
 
         try {
-            String contingut = servei.llegirFitxer(fitxerOriginal);
-            fitxerComprès = new File("comprés.txt");
-            servei.comprimir(contingut, fitxerComprès);
+            String contingut = servei.llegirFitxer(model.getFitxerOriginal());
+            File sortida = new File("comprés.txt");
+            servei.comprimir(contingut, sortida);
+            model.setFitxerComprès(sortida);
         } catch (Exception e) {
             vista.mostrarMissatge("Error durant la compressió.");
         }
@@ -57,29 +57,35 @@ public class Controlador implements Notificar {
     }
 
     public void guardarFitxer() {
-        if (fitxerComprès == null) {
+        if (model.getFitxerComprès() == null) {
             vista.mostrarMissatge("Cap fitxer comprimit per guardar.");
             return;
         }
 
         JFileChooser selector = new JFileChooser();
-        selector.setSelectedFile(new File("comprés.huff"));
+
+        String nomSenseExtensio = model.getFitxerOriginal().getName().replaceFirst("[.][^.]+$", "");
+
+        selector.setSelectedFile(new File(nomSenseExtensio + "_comprés.huff"));
         int resultat = selector.showSaveDialog(null);
         if (resultat == JFileChooser.APPROVE_OPTION) {
             File desti = selector.getSelectedFile();
-            fitxerComprès.renameTo(desti);
+            model.getFitxerComprès().renameTo(desti);
             vista.mostrarMissatge("Fitxer guardat com: " + desti.getName());
         }
     }
 
     public void testFidelitat() {
-        if (fitxerOriginal == null || fitxerDescomprès == null) {
+        if (model.getFitxerOriginal() == null || model.getFitxerDescomprès() == null) {
             vista.mostrarMissatge("Cal un fitxer original i un descomprimit per fer el test.");
             return;
         }
 
         try {
-            boolean iguals = TestFidelitat.compararFitxers(fitxerOriginal, fitxerDescomprès);
+            boolean iguals = TestFidelitat.compararFitxers(
+                model.getFitxerOriginal(),
+                model.getFitxerDescomprès()
+            );
             if (iguals) {
                 notificar(Notificacio.TEST_FIDELITAT_OK);
                 vista.mostrarMissatge("Els fitxers són idèntics.");

@@ -1,37 +1,54 @@
 package model;
 
-/**
- * Enum Tipus: Representa els tipus de càlcul que es poden realitzar
- * amb els punts generats: parella de punts més propera o més llunyana.
- *
- * Tipus disponibles:
- * - PROPER: Trobar la parella de punts més propera.
- * - LLUNY: Trobar la parella de punts més llunyana.
- *
- * @author tonitorres
- */
-public enum NodeHuffman {
-    PROPER("Parella més propera"),
-    LLUNY("Parella més llunyana");
+public class NodeHuffman implements Comparable<NodeHuffman> {
+    private final char simbol;
+    private final int frequencia;
+    private NodeHuffman esquerra;
+    private NodeHuffman dreta;
 
-    private final String description;
-
-    /**
-     * Constructor per inicialitzar la descripció del tipus.
-     *
-     * @param description La descripció textual del tipus de càlcul.
-     */
-    NodeHuffman(String d) {
-        description = d;
+    public NodeHuffman(char simbol, int frequencia) {
+        this.simbol = simbol;
+        this.frequencia = frequencia;
+        this.esquerra = null;
+        this.dreta = null;
     }
 
-    /**
-     * Retorna la descripció del tipus de càlcul.
-     *
-     * @return Una cadena amb la descripció del tipus.
-     */
+    public void setNodeEsquerra(NodeHuffman node) {
+        esquerra = node;
+    }
+
+    public void setNodeDreta(NodeHuffman node) {
+        dreta = node;
+    }
+
+    public boolean esFulla() {
+        return esquerra == null && dreta == null;
+    }
+
+    public char getSimbol(){
+        return simbol;
+    }
+
+    public int getFrequencia(){
+        return frequencia;
+    }
+
+    public NodeHuffman getNodeEsquerra(){
+        return esquerra;
+    }
+
+    public NodeHuffman getNodeDreta(){
+        return dreta;
+    }
+
     @Override
-    public String toString() {
-        return description;
+    public int compareTo(NodeHuffman altre) {
+        if (getFrequencia() > altre.getFrequencia()) {
+            return 1;
+        } else if(getFrequencia() < altre.getFrequencia()) {
+            return -1;
+        } else {
+            return 0;
+        }
     }
 }

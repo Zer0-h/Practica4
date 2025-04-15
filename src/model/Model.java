@@ -1,32 +1,36 @@
 package model;
 
+import java.io.File;
+
 /**
- *
- * @author tonitorres
+ * Classe que encapsula l'estat de l'aplicació: fitxers implicats en la compressió.
  */
-public enum Model {
-    GAUSSIAN("Gaussiana"),
-    EXPONENCIAL("Exponencial"),
-    UNIFORME("Uniforme");
+public class Model {
+    private File fitxerOriginal;
+    private File fitxerComprès;
+    private File fitxerDescomprès;
 
-    private final String description;
-
-    /**
-     * Constructor per inicialitzar la descripció de la distribució.
-     *
-     * @param d La descripció textual del tipus de distribució.
-     */
-    Model(String d) {
-        description = d;
+    public File getFitxerOriginal() {
+        return fitxerOriginal;
     }
 
-    /**
-     * Retorna la descripció del tipus de distribució.
-     *
-     * @return Una cadena amb la descripció de la distribució.
-     */
-    @Override
-    public String toString() {
-        return description;
+    public void setFitxerOriginal(File fitxerOriginal) {
+        this.fitxerOriginal = fitxerOriginal;
+    }
+
+    public File getFitxerComprès() {
+        return fitxerComprès;
+    }
+
+    public void setFitxerComprès(File fitxerComprès) {
+        this.fitxerComprès = fitxerComprès;
+    }
+
+    public File getFitxerDescomprès() {
+        return fitxerDescomprès;
+    }
+
+    public void setFitxerDescomprès(File fitxerDescomprès) {
+        this.fitxerDescomprès = fitxerDescomprès;
     }
 }

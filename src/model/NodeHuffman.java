@@ -10,7 +10,7 @@ package model;
  *
  * @author tonitorres
  */
-public enum Tipus {
+public enum NodeHuffman {
     PROPER("Parella més propera"),
     LLUNY("Parella més llunyana");
 
@@ -21,7 +21,7 @@ public enum Tipus {
      *
      * @param description La descripció textual del tipus de càlcul.
      */
-    Tipus(String d) {
+    NodeHuffman(String d) {
         description = d;
     }
 

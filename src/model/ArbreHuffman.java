@@ -15,7 +15,7 @@ package model;
  *
  * @author tonitorres
  */
-public enum Metode {
+public enum ArbreHuffman {
     FORCA_BRUTA("Clàssic O(n²)"),
     DIVIDEIX("Divideix i Venceràs O(n·log(n))"),
     CONVEX_HULL("Convex Hull + Rotating Calipers O(n·log(n))");
@@ -28,7 +28,7 @@ public enum Metode {
      * @param description La descripció textual del mètode i la seva
      *                    complexitat.
      */
-    Metode(String d) {
+    ArbreHuffman(String d) {
         description = d;
     }
 

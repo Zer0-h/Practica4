@@ -11,7 +11,7 @@ import javax.swing.*;
  *
  * @autor tonitorres
  */
-public class BottomPanel extends JPanel {
+public class BotonsPanel extends JPanel {
 
     private final JLabel timeLabel;       // Etiqueta per mostrar el temps d'execució
     private final JTextArea textArea;     // Àrea de text per mostrar la solució
@@ -22,7 +22,7 @@ public class BottomPanel extends JPanel {
      * Constructor que inicialitza el panell inferior amb la disposició i els
      * components necessaris.
      */
-    public BottomPanel() {
+    public BotonsPanel() {
         setLayout(new BorderLayout());
 
         tempsEstimat = 0.0;

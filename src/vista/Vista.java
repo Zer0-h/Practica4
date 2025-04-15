@@ -4,10 +4,10 @@ import controlador.Controlador;
 import java.awt.*;
 import javax.swing.*;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
-import model.ComparativaResultat;
-import model.Distribucio;
+import model.Test;
 import model.Model;
-import model.Tipus;
+import model.Utils;
+import model.NodeHuffman;
 
 /**
  * Classe Vista: Interfície gràfica de l'aplicació
@@ -19,12 +19,12 @@ import model.Tipus;
 public class Vista extends JFrame {
 
     private final Controlador controlador;
-    private final Model model;
+    private final Utils model;
 
     // Panells de la vista
     private TopPanel topPanel;
-    private BottomPanel bottomPanel;
-    private GraphPanel graphPanel;
+    private BotonsPanel bottomPanel;
+    private ArbrePanel graphPanel;
     private ComparativaVista comparativaVista;
 
     /**
@@ -52,11 +52,11 @@ public class Vista extends JFrame {
         add(topPanel, BorderLayout.NORTH);
 
         // Panell central per al gràfic
-        graphPanel = new GraphPanel(900, 600);
+        graphPanel = new ArbrePanel(900, 600);
         add(graphPanel, BorderLayout.CENTER);
 
-        // Panell inferior per a informació i resultats
-        bottomPanel = new BottomPanel();
+        // Panell inferior per Model informació i resultats
+        bottomPanel = new BotonsPanel();
         add(bottomPanel, BorderLayout.SOUTH);
 
         setVisible(true);
@@ -80,24 +80,24 @@ public class Vista extends JFrame {
     }
 
     /**
-     * Obté el model associat a la vista.
+     * Obté el model associat Model la vista.
      *
-     * @return Model de dades.
+     * @return Utils de dades.
      */
-    public Model getModel() {
+    public Utils getModel() {
         return model;
     }
 
     /**
-     * Acció en clicar el botó d'iniciar el càlcul.
+     * Acció en clicar el botó Utils'iniciar el càlcul.
      */
     protected void startClicked() {
         if (model.tePunts()) {
             // Configura el model segons el tipus de problema
-            model.setMinimizar(topPanel.getProblema() == Tipus.PROPER);
+            model.setMinimizar(topPanel.getProblema() == NodeHuffman.PROPER);
             model.setMetode(topPanel.getSolucio());
 
-            // Calcula el temps estimat abans d'iniciar
+            // Calcula el temps estimat abans Utils'iniciar
             bottomPanel.setTempsEstimat(model.calcularTempsEstimacio());
 
             // Mostra la barra de progrés i desactiva els botons
@@ -113,7 +113,7 @@ public class Vista extends JFrame {
      * Acció en clicar el botó de generar punts.
      */
     protected void generatePointsClicked() {
-        Distribucio distribucio = topPanel.getDistribucio();
+        Model distribucio = topPanel.getDistribucio();
         model.setDistribucio(distribucio);
         model.generarNuvolPunts(topPanel.getQuantitatPunts());
         graphPanel.colocaPunts(model.getPunts());
@@ -129,7 +129,7 @@ public class Vista extends JFrame {
             comparativaVista = new ComparativaVista();
             comparativaVista.setVisible(true);
 
-            model.setMinimizar(topPanel.getProblema() == Tipus.PROPER);
+            model.setMinimizar(topPanel.getProblema() == NodeHuffman.PROPER);
 
             // Notifica el controlador per iniciar la comparativa
             controlador.comparativaProcessos();
@@ -149,7 +149,7 @@ public class Vista extends JFrame {
      *
      * @param resultat Resultat del procés.
      */
-    public void mostrarResultatComparativa(ComparativaResultat resultat) {
+    public void mostrarResultatComparativa(Test resultat) {
         comparativaVista.afegirResultat(resultat);
     }
 
@@ -166,16 +166,16 @@ public class Vista extends JFrame {
     }
 
     /**
-     * Activa o desactiva els botons segons l'estat d'execució.
+     * Activa o desactiva els botons segons l'estat Utils'execució.
      *
-     * @param enExecucio Estat d'execució (true si s'està executant).
+     * @param enExecucio Estat Utils'execució (true si s'està executant).
      */
     protected void toggleInProgress(boolean enExecucio) {
         topPanel.toggleInProgress(enExecucio);
     }
 
     /**
-     * Mostra un missatge d'error en cas d'operació no vàlida.
+     * Mostra un missatge Utils'error en cas Utils'operació no vàlida.
      */
     public void errorExecucio(String message) {
         toggleInProgress(true);

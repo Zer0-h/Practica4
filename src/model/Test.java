@@ -3,16 +3,16 @@ package model;
 import java.awt.geom.Point2D;
 
 /**
- * Classe ComparativaResultat: Representa el resultat d'un procés de
- * comparativa.
+ * Classe Test: Representa el resultat d'un procés de
+ comparativa.
  */
-public class ComparativaResultat {
+public class Test {
 
     private final String metode;
     private final double temps;
     private final Point2D.Double[] solucio;
 
-    public ComparativaResultat(String metode, double temps, Point2D.Double[] solucio) {
+    public Test(String metode, double temps, Point2D.Double[] solucio) {
         this.metode = metode;
         this.temps = temps;
         this.solucio = solucio;

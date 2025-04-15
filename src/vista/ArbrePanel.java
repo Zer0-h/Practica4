@@ -11,7 +11,7 @@ import javax.swing.*;
  *
  * @author tonitorres
  */
-public class GraphPanel extends JPanel {
+public class ArbrePanel extends JPanel {
 
     private Point2D.Double[] punts;        // Conjunt de punts generats
     private Point2D.Double[] puntsSolucio; // Parella de punts que formen la millor solució
@@ -23,7 +23,7 @@ public class GraphPanel extends JPanel {
      * @param amplada Amplada del panell gràfic.
      * @param altura  Altura del panell gràfic.
      */
-    public GraphPanel(int amplada, int altura) {
+    public ArbrePanel(int amplada, int altura) {
         setPreferredSize(new Dimension(amplada, altura));
         setBackground(Color.WHITE);
     }

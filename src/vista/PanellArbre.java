@@ -9,22 +9,23 @@ import java.awt.geom.AffineTransform;
 
 public class PanellArbre extends JPanel {
 
-    private NodeHuffman arrel;
+    private NodeVisual arrelVisual;
     private double escala = 1.0;
     private Point arrossegantDesDe = null;
     private int offsetX = 0, offsetY = 0;
+    private int posicioXActual = 0;
 
     public PanellArbre() {
         setBackground(Color.WHITE);
 
-        // Scroll amb la roda del ratolí (zoom)
+        // Zoom amb scroll
         addMouseWheelListener(e -> {
             escala *= (e.getWheelRotation() < 0) ? 1.1 : 0.9;
             escala = Math.max(0.1, Math.min(escala, 5.0));
             repaint();
         });
 
-        // Arrossegar per moure
+        // Arrossegar
         addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 arrossegantDesDe = e.getPoint();
@@ -46,71 +47,97 @@ public class PanellArbre extends JPanel {
     }
 
     public void setArrel(NodeHuffman arrel) {
-        this.arrel = arrel;
         this.offsetX = 0;
         this.offsetY = 0;
         this.escala = 1.0;
+        this.posicioXActual = 0;
+
+        if (arrel != null) {
+            arrelVisual = construirArbreVisual(arrel, 0);
+        } else {
+            arrelVisual = null;
+        }
+    }
+
+    private NodeVisual construirArbreVisual(NodeHuffman node, int profunditat) {
+        if (node == null) return null;
+
+        NodeVisual esquerra = construirArbreVisual(node.getNodeEsquerra(), profunditat + 1);
+        NodeVisual dreta = construirArbreVisual(node.getNodeDreta(), profunditat + 1);
+
+        int x;
+        if (esquerra == null && dreta == null) {
+            x = posicioXActual++ * 80;
+        } else if (esquerra != null && dreta != null) {
+            x = (esquerra.getX() + dreta.getX()) / 2;
+        } else if (esquerra != null) {
+            x = esquerra.getX();
+        } else {
+            x = dreta.getX();
+        }
+
+        int y = profunditat * 80;
+        NodeVisual visual = new NodeVisual(node, x, y);
+        visual.setEsquerra(esquerra);
+        visual.setDreta(dreta);
+        return visual;
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if (arrel != null) {
+        setBackground(Color.WHITE);
+
+        if (arrelVisual != null) {
             Graphics2D g2 = (Graphics2D) g;
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             AffineTransform original = g2.getTransform();
 
-            // Aplicar escala i desplaçament
             g2.translate(offsetX, offsetY);
             g2.scale(escala, escala);
 
-            // Dibuixar arbre
             g2.setFont(new Font("SansSerif", Font.PLAIN, 12));
-            dibuixarArbre(g2, arrel, getWidth() / 2, 30, getWidth() / 4);
+            dibuixarNodeVisual(g2, arrelVisual);
 
             g2.setTransform(original);
         }
     }
 
-    private void dibuixarArbre(Graphics2D g, NodeHuffman node, int x, int y, int dx) {
+    private void dibuixarNodeVisual(Graphics2D g, NodeVisual node) {
         if (node == null) return;
 
-        int nextY = y + 60;
-        int radi = 25;
+        int r = 25;
 
-        if (node.getNodeEsquerra() != null) {
-            int xEsq = x - dx;
+        // Connexions
+        if (node.getEsquerra() != null) {
             g.setColor(Color.BLACK);
-            g.drawLine(x, y, xEsq, nextY);
-            g.drawString("0", (x + xEsq) / 2 - 10, (y + nextY) / 2);
-            dibuixarArbre(g, node.getNodeEsquerra(), xEsq, nextY, dx / 2);
+            g.drawLine(node.getX(), node.getY(), node.getEsquerra().getX(), node.getEsquerra().getY());
+            g.drawString("0", (node.getX() + node.getEsquerra().getX()) / 2 - 10,
+                              (node.getY() + node.getEsquerra().getY()) / 2);
+            dibuixarNodeVisual(g, node.getEsquerra());
         }
 
-        if (node.getNodeDreta() != null) {
-            int xDret = x + dx;
+        if (node.getDreta() != null) {
             g.setColor(Color.BLACK);
-            g.drawLine(x, y, xDret, nextY);
-            g.drawString("1", (x + xDret) / 2 + 5, (y + nextY) / 2);
-            dibuixarArbre(g, node.getNodeDreta(), xDret, nextY, dx / 2);
+            g.drawLine(node.getX(), node.getY(), node.getDreta().getX(), node.getDreta().getY());
+            g.drawString("1", (node.getX() + node.getDreta().getX()) / 2 + 5,
+                              (node.getY() + node.getDreta().getY()) / 2);
+            dibuixarNodeVisual(g, node.getDreta());
         }
 
-        // Text del node
-        String text = node.esFulla()
-                ? "'" + node.getSimbol() + "':" + node.getFrequencia()
-                : String.valueOf(node.getFrequencia());
+        // Dibuixar el node
+        String text = node.getDada().esFulla()
+                ? "'" + node.getDada().getSimbol() + "':" + node.getDada().getFrequencia()
+                : String.valueOf(node.getDada().getFrequencia());
 
-        dibuixarCercle(g, x, y, radi, text, node.esFulla());
-    }
-
-    private void dibuixarCercle(Graphics2D g, int x, int y, int r, String text, boolean esFulla) {
-        g.setColor(esFulla ? new Color(173, 216, 230) : new Color(200, 200, 200));
-        g.fillOval(x - r, y - r, 2 * r, 2 * r);
+        g.setColor(node.getDada().esFulla() ? new Color(173, 216, 230) : new Color(200, 200, 200));
+        g.fillOval(node.getX() - r, node.getY() - r, 2 * r, 2 * r);
         g.setColor(Color.BLACK);
-        g.drawOval(x - r, y - r, 2 * r, 2 * r);
+        g.drawOval(node.getX() - r, node.getY() - r, 2 * r, 2 * r);
 
         FontMetrics fm = g.getFontMetrics();
         int textWidth = fm.stringWidth(text);
         int textHeight = fm.getAscent();
-        g.drawString(text, x - textWidth / 2, y + textHeight / 4);
+        g.drawString(text, node.getX() - textWidth / 2, node.getY() + textHeight / 4);
     }
 }

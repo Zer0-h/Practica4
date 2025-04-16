@@ -85,37 +85,37 @@ public class ServeiCompressio {
             controlador.notificar(Notificacio.ERROR);
         }
     }
-
+    
     public void descomprimir(File fitxerComprès, File fitxerSortida) {
         try (FileInputStream in = new FileInputStream(fitxerComprès);
              ObjectInputStream ois = new ObjectInputStream(in)) {
 
+            // 1. Llegim la taula de codis
             Map<Character, String> codis = (Map<Character, String>) ois.readObject();
 
+            // 2. Construïm la taula inversa
             Map<String, Character> codisInvers = new HashMap<>();
             for (Map.Entry<Character, String> entrada : codis.entrySet()) {
                 codisInvers.put(entrada.getValue(), entrada.getKey());
             }
 
+            // 3. Llegim el padding i els bytes codificats
             int padding = ois.readInt();
+            byte[] bytes = (byte[]) ois.readObject();
 
-            ByteArrayOutputStream bytesCodificats = new ByteArrayOutputStream();
-            int b;
-            while ((b = in.read()) != -1) {
-                bytesCodificats.write(b);
-            }
-
+            // 4. Convertim bytes a cadena de bits
             StringBuilder bits = new StringBuilder();
-            byte[] bytes = bytesCodificats.toByteArray();
             for (byte bt : bytes) {
                 String binari = String.format("%8s", Integer.toBinaryString(bt & 0xFF)).replace(' ', '0');
                 bits.append(binari);
             }
 
+            // 5. Eliminem padding final
             if (padding > 0 && bits.length() >= padding) {
                 bits.setLength(bits.length() - padding);
             }
 
+            // 6. Descodifiquem i escrivim el fitxer
             StringBuilder buffer = new StringBuilder();
             BufferedWriter escriptor = new BufferedWriter(new FileWriter(fitxerSortida));
             for (char bit : bits.toString().toCharArray()) {
@@ -126,6 +126,9 @@ public class ServeiCompressio {
                 }
             }
             escriptor.close();
+
+            // 7. Notifiquem i guardam el fitxer al model
+            controlador.getModel().setFitxerDescomprès(fitxerSortida);
             controlador.notificar(Notificacio.DESCOMPRESSIO_COMPLETA);
 
         } catch (IOException | ClassNotFoundException e) {

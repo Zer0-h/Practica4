@@ -4,6 +4,7 @@ import controlador.Controlador;
 
 import javax.swing.*;
 import java.awt.*;
+import model.Model;
 
 public class Vista extends JFrame {
 
@@ -39,8 +40,26 @@ public class Vista extends JFrame {
         JOptionPane.showMessageDialog(this, missatge);
     }
 
-    public void mostrarEstadistiques(String text) {
+    public void mostrarEstadistiquesCompressio() {
+        Model model = controlador.getModel();
+
+        String text = String.format("""
+            Mida comprimida: %d bytes
+            Temps de compressió: %d ms
+            Longitud mitjana del codi: %.3f bits/símbol
+            Taxa de compressió: %.2f %%
+            """,
+            model.getFitxerComprès().length(),
+            model.getTempsCompressioMs(),
+            model.getLongitudMitjanaCodi(),
+            model.getTaxaCompressio()
+        );
+
         panellEstadistiques.mostrarEstadistiques(text);
+    }
+
+    public void mostrarNomFitxerCarregat(String nom, long mida) {
+        panellEstadistiques.mostrarNomIFitxer(nom, mida);
     }
 
     public PanellArbre getPanellArbre() {

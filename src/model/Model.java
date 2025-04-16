@@ -70,4 +70,20 @@ public class Model {
     public void setArrelHuffman(NodeHuffman arrelHuffman) {
         this.arrelHuffman = arrelHuffman;
     }
+
+    public String getEstadistiquesFormatades() {
+        if (fitxerOriginal == null || fitxerComprès == null) return "";
+
+        return String.format("""
+            Mida comprimida: %d bytes
+            Temps de compressió: %d ms
+            Longitud mitjana del codi: %.3f bits/símbol
+            Taxa de compressió: %.2f %%
+            """,
+            fitxerComprès.length(),
+            tempsCompressioMs,
+            longitudMitjanaCodi,
+            taxaCompressio
+        );
+    }
 }

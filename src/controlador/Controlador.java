@@ -30,7 +30,7 @@ public class Controlador implements Notificar {
         if (selector.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
             File fitxer = selector.getSelectedFile();
             model.setFitxerOriginal(fitxer);
-            vista.mostrarMissatge("Fitxer carregat: " + fitxer.getName());
+            vista.mostrarNomFitxerCarregat(fitxer.getName(), fitxer.length());
             notificar(Notificacio.FITXER_CARREGAT);
         }
     }
@@ -43,26 +43,12 @@ public class Controlador implements Notificar {
 
         try {
             String contingut = servei.llegirFitxer(model.getFitxerOriginal());
-            File sortida = new File("comprés.txt");
+            File sortida = new File(model.getFitxerOriginal() + ".huff");
             servei.comprimir(contingut, sortida);
             model.setFitxerComprès(sortida);
             vista.getPanellArbre().setArrel(model.getArrelHuffman());
             vista.getPanellArbre().repaint();
-            vista.mostrarEstadistiques(String.format("""
-                📊 Estadístiques de compressió
-                ------------------------------
-                Mida original: %d bytes
-                Mida comprimida: %d bytes
-                Temps de compressió: %d ms
-                Longitud mitjana del codi: %.3f bits/símbol
-                Taxa de compressió: %.2f %%
-                """,
-                model.getFitxerOriginal().length(),
-                model.getFitxerComprès().length(),
-                model.getTempsCompressioMs(),
-                model.getLongitudMitjanaCodi(),
-                model.getTaxaCompressio()
-            ));
+            vista.mostrarEstadistiquesCompressio();
 
         } catch (Exception e) {
             vista.mostrarMissatge("Error durant la compressió.");
@@ -75,11 +61,24 @@ public class Controlador implements Notificar {
             return;
         }
 
-        File fitxerDescomprès = new File("descomprès.txt");
+        File fitxerDescomprès = new File(model.getFitxerComprès().getName().replace(".huff", ""));
         try {
             servei.descomprimir(model.getFitxerComprès(), fitxerDescomprès);
             model.setFitxerDescomprès(fitxerDescomprès);
-            vista.mostrarMissatge("Fitxer descomprimit correctament.");
+            //vista.mostrarMissatge("Fitxer descomprimit correctament.");
+
+
+            // Guardam
+            JFileChooser selector = new JFileChooser();
+
+            selector.setSelectedFile(new File(model.getFitxerDescomprès().getName()));
+            int resultat = selector.showSaveDialog(null);
+            if (resultat == JFileChooser.APPROVE_OPTION) {
+                File desti = selector.getSelectedFile();
+                model.getFitxerDescomprès().renameTo(desti);
+                vista.mostrarMissatge("Fitxer guardat com: " + desti.getName());
+            }
+
         } catch (Exception e) {
             vista.mostrarMissatge("Error durant la descompressió.");
         }
@@ -93,9 +92,7 @@ public class Controlador implements Notificar {
 
         JFileChooser selector = new JFileChooser();
 
-        String nomSenseExtensio = model.getFitxerOriginal().getName().replaceFirst("[.][^.]+$", "");
-
-        selector.setSelectedFile(new File(nomSenseExtensio + "_comprés.huff"));
+        selector.setSelectedFile(new File(model.getFitxerComprès().getName()));
         int resultat = selector.showSaveDialog(null);
         if (resultat == JFileChooser.APPROVE_OPTION) {
             File desti = selector.getSelectedFile();

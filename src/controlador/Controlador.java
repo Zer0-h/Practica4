@@ -48,6 +48,22 @@ public class Controlador implements Notificar {
             model.setFitxerComprès(sortida);
             vista.getPanellArbre().setArrel(model.getArrelHuffman());
             vista.getPanellArbre().repaint();
+            vista.mostrarEstadistiques(String.format("""
+                📊 Estadístiques de compressió
+                ------------------------------
+                Mida original: %d bytes
+                Mida comprimida: %d bytes
+                Temps de compressió: %d ms
+                Longitud mitjana del codi: %.3f bits/símbol
+                Taxa de compressió: %.2f %%
+                """,
+                model.getFitxerOriginal().length(),
+                model.getFitxerComprès().length(),
+                model.getTempsCompressioMs(),
+                model.getLongitudMitjanaCodi(),
+                model.getTaxaCompressio()
+            ));
+
         } catch (Exception e) {
             vista.mostrarMissatge("Error durant la compressió.");
         }

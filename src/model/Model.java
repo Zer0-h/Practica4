@@ -9,7 +9,35 @@ public class Model {
     private File fitxerOriginal;
     private File fitxerComprès;
     private File fitxerDescomprès;
+    private long tempsCompressioMs;
+    private double longitudMitjanaCodi;
+    private double taxaCompressio;
+
     private NodeHuffman arrelHuffman;
+
+    public long getTempsCompressioMs() {
+        return tempsCompressioMs;
+    }
+
+    public void setTempsCompressioMs(long tempsCompressioMs) {
+        this.tempsCompressioMs = tempsCompressioMs;
+    }
+
+    public double getLongitudMitjanaCodi() {
+        return longitudMitjanaCodi;
+    }
+
+    public void setLongitudMitjanaCodi(double longitudMitjanaCodi) {
+        this.longitudMitjanaCodi = longitudMitjanaCodi;
+    }
+
+    public double getTaxaCompressio() {
+        return taxaCompressio;
+    }
+
+    public void setTaxaCompressio(double taxaCompressio) {
+        this.taxaCompressio = taxaCompressio;
+    }
 
     public File getFitxerOriginal() {
         return fitxerOriginal;

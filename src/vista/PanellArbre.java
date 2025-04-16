@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
+import java.util.ArrayList;
 
 public class PanellArbre extends JPanel {
 
@@ -47,17 +48,61 @@ public class PanellArbre extends JPanel {
     }
 
     public void setArrel(NodeHuffman arrel) {
-        this.offsetX = 0;
-        this.offsetY = 0;
-        this.escala = 1.0;
         this.posicioXActual = 0;
 
         if (arrel != null) {
             arrelVisual = construirArbreVisual(arrel, 0);
+
+            // Calcular dimensions de l’arbre
+            Rectangle bounds = calcularDimensions(arrelVisual);
+
+            // Escalar i centrar
+            int amplePanell = getWidth();
+            int altPanell = getHeight();
+
+            double escalaX = amplePanell / (double) (bounds.width + 80); // + marge
+            double escalaY = altPanell / (double) (bounds.height + 80);
+            this.escala = Math.min(escalaX, escalaY) * 0.9;
+
+            // Calcular el centre real de l’arbre
+            double centreArbreX = (bounds.x + bounds.width / 2.0) * escala;
+            double centreArbreY = (bounds.y + bounds.height / 2.0) * escala;
+
+            // Centrar-lo al mig del panell
+            this.offsetX = (int) (getWidth() / 2 - centreArbreX);
+            this.offsetY = (int) (getHeight() / 2 - centreArbreY);
+
         } else {
             arrelVisual = null;
+            this.offsetX = 0;
+            this.offsetY = 0;
+            this.escala = 1.0;
         }
+
+        repaint();
     }
+
+    private Rectangle calcularDimensions(NodeVisual node) {
+        ArrayList<Integer> xs = new ArrayList<>();
+        ArrayList<Integer> ys = new ArrayList<>();
+        recollirCoordenades(node, xs, ys);
+
+        int minX = xs.stream().min(Integer::compareTo).orElse(0);
+        int maxX = xs.stream().max(Integer::compareTo).orElse(0);
+        int minY = ys.stream().min(Integer::compareTo).orElse(0);
+        int maxY = ys.stream().max(Integer::compareTo).orElse(0);
+
+        return new Rectangle(minX, minY, maxX - minX, maxY - minY);
+    }
+
+    private void recollirCoordenades(NodeVisual node, ArrayList<Integer> xs, ArrayList<Integer> ys) {
+        if (node == null) return;
+        xs.add(node.getX());
+        ys.add(node.getY());
+        recollirCoordenades(node.getEsquerra(), xs, ys);
+        recollirCoordenades(node.getDreta(), xs, ys);
+    }
+
 
     private NodeVisual construirArbreVisual(NodeHuffman node, int profunditat) {
         if (node == null) return null;

@@ -4,7 +4,6 @@ import controlador.Controlador;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
 
 public class PanellBotons extends JPanel {
 
@@ -12,7 +11,6 @@ public class PanellBotons extends JPanel {
     private final JButton botoComprimir;
     private final JButton botoDescomprimir;
     private final JButton botoGuardar;
-    private final JButton botoTestFidelitat;
 
     public PanellBotons(Controlador controlador) {
         setLayout(new FlowLayout());
@@ -20,8 +18,7 @@ public class PanellBotons extends JPanel {
         botoCarregar = new JButton("Carregar Fitxer");
         botoComprimir = new JButton("Comprimir");
         botoDescomprimir = new JButton("Descomprimir");
-        botoGuardar = new JButton("Guardar Comprimits");
-        botoTestFidelitat = new JButton("Test Fidelitat");
+        botoGuardar = new JButton("Guardar Comprimit");
 
         botoCarregar.addActionListener(e -> controlador.carregarFitxer());
         botoComprimir.addActionListener(e -> controlador.comprimir());
@@ -32,6 +29,5 @@ public class PanellBotons extends JPanel {
         add(botoComprimir);
         add(botoDescomprimir);
         add(botoGuardar);
-        add(botoTestFidelitat);
     }
 }

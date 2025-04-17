@@ -162,8 +162,10 @@ public class ServeiCompressio {
                 }
             }
 
-            // Reconstruïm arbre des de la taula
-            return reconstruirArbreDesDeCodis(codis, frequencies);
+            NodeHuffman arrelArbre = reconstruirArbreDesDeCodis(codis, frequencies);
+            propagarFrequencies(arrelArbre);
+
+            return arrelArbre;
         }
     }
 
@@ -196,4 +198,17 @@ public class ServeiCompressio {
         }
         return arrel;
     }
+
+    private int propagarFrequencies(NodeHuffman node) {
+        if (node == null) return 0;
+        if (node.esFulla()) return node.getFrequencia();
+
+        int freqEsq = propagarFrequencies(node.getNodeEsquerra());
+        int freqDret = propagarFrequencies(node.getNodeDreta());
+
+        int total = freqEsq + freqDret;
+        node.setFrequencia(total);
+        return total;
+    }
+
 }

@@ -19,56 +19,56 @@ public class Model {
         return tempsCompressioMs;
     }
 
-    public void setTempsCompressioMs(long tempsCompressioMs) {
-        this.tempsCompressioMs = tempsCompressioMs;
+    public void setTempsCompressioMs(long value) {
+        tempsCompressioMs = value;
     }
 
     public double getLongitudMitjanaCodi() {
         return longitudMitjanaCodi;
     }
 
-    public void setLongitudMitjanaCodi(double longitudMitjanaCodi) {
-        this.longitudMitjanaCodi = longitudMitjanaCodi;
+    public void setLongitudMitjanaCodi(double value) {
+        longitudMitjanaCodi = value;
     }
 
     public double getTaxaCompressio() {
         return taxaCompressio;
     }
 
-    public void setTaxaCompressio(double taxaCompressio) {
-        this.taxaCompressio = taxaCompressio;
+    public void setTaxaCompressio(double value) {
+        taxaCompressio = value;
     }
 
     public File getFitxerOriginal() {
         return fitxerOriginal;
     }
 
-    public void setFitxerOriginal(File fitxerOriginal) {
-        this.fitxerOriginal = fitxerOriginal;
+    public void setFitxerOriginal(File value) {
+        fitxerOriginal = value;
     }
 
     public File getFitxerComprès() {
         return fitxerComprès;
     }
 
-    public void setFitxerComprès(File fitxerComprès) {
-        this.fitxerComprès = fitxerComprès;
+    public void setFitxerComprès(File value) {
+        fitxerComprès = value;
     }
 
     public File getFitxerDescomprès() {
         return fitxerDescomprès;
     }
 
-    public void setFitxerDescomprès(File fitxerDescomprès) {
-        this.fitxerDescomprès = fitxerDescomprès;
+    public void setFitxerDescomprès(File value) {
+        fitxerDescomprès = value;
     }
 
     public NodeHuffman getArrelHuffman() {
         return arrelHuffman;
     }
 
-    public void setArrelHuffman(NodeHuffman arrelHuffman) {
-        this.arrelHuffman = arrelHuffman;
+    public void setArrelHuffman(NodeHuffman value) {
+        arrelHuffman = value;
     }
 
     public String getEstadistiquesFormatades() {

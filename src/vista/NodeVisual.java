@@ -10,8 +10,8 @@ public class NodeVisual {
     private NodeVisual esquerra;
     private NodeVisual dreta;
 
-    public NodeVisual(NodeHuffman dada, int x, int y) {
-        this.dada = dada;
+    public NodeVisual(NodeHuffman d, int x, int y) {
+        dada = d;
         this.x = x;
         this.y = y;
     }
@@ -20,8 +20,8 @@ public class NodeVisual {
         return dada;
     }
 
-    public void setDada(NodeHuffman dada) {
-        this.dada = dada;
+    public void setDada(NodeHuffman value) {
+        dada = value;
     }
 
     public int getX() {
@@ -44,15 +44,15 @@ public class NodeVisual {
         return esquerra;
     }
 
-    public void setEsquerra(NodeVisual esquerra) {
-        this.esquerra = esquerra;
+    public void setEsquerra(NodeVisual value) {
+        this.esquerra = value;
     }
 
     public NodeVisual getDreta() {
         return dreta;
     }
 
-    public void setDreta(NodeVisual dreta) {
-        this.dreta = dreta;
+    public void setDreta(NodeVisual value) {
+        dreta = value;
     }
 }

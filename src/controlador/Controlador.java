@@ -20,10 +20,10 @@ public class Controlador implements Notificar {
     }
 
     public void inicialitzar() {
-        this.servei = new ServeiCompressio(this);
-        this.vista = new Vista(this);
-        this.model = new Model();
-        this.vista.mostrar();
+        servei = new ServeiCompressio(this);
+        vista = new Vista(this);
+        model = new Model();
+        vista.mostrar();
     }
 
     public void carregarFitxer() {

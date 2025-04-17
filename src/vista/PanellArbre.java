@@ -48,7 +48,7 @@ public class PanellArbre extends JPanel {
     }
 
     public void setArrel(NodeHuffman arrel) {
-        this.posicioXActual = 0;
+        posicioXActual = 0;
 
         if (arrel != null) {
             arrelVisual = construirArbreVisual(arrel, 0);
@@ -62,21 +62,21 @@ public class PanellArbre extends JPanel {
 
             double escalaX = amplePanell / (double) (bounds.width + 80); // + marge
             double escalaY = altPanell / (double) (bounds.height + 80);
-            this.escala = Math.min(escalaX, escalaY) * 0.9;
+            escala = Math.min(escalaX, escalaY) * 0.9;
 
             // Calcular el centre real de l’arbre
             double centreArbreX = (bounds.x + bounds.width / 2.0) * escala;
             double centreArbreY = (bounds.y + bounds.height / 2.0) * escala;
 
             // Centrar-lo al mig del panell
-            this.offsetX = (int) (getWidth() / 2 - centreArbreX);
-            this.offsetY = (int) (getHeight() / 2 - centreArbreY);
+            offsetX = (int) (getWidth() / 2 - centreArbreX);
+            offsetY = (int) (getHeight() / 2 - centreArbreY);
 
         } else {
             arrelVisual = null;
-            this.offsetX = 0;
-            this.offsetY = 0;
-            this.escala = 1.0;
+            offsetX = 0;
+            offsetY = 0;
+            escala = 1.0;
         }
 
         repaint();

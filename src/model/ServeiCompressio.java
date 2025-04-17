@@ -14,8 +14,8 @@ public class ServeiCompressio {
     private final Controlador controlador;
     private NodeHuffman arrel;
 
-    public ServeiCompressio(Controlador controlador) {
-        this.controlador = controlador;
+    public ServeiCompressio(Controlador c) {
+        controlador = c;
     }
 
     public String llegirFitxer(File fitxer) throws IOException {

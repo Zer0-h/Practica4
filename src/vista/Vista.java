@@ -13,9 +13,9 @@ public class Vista extends JFrame {
     private final PanellArbre panellArbre;
     private final PanellEstadistiques panellEstadistiques;
 
-    public Vista(Controlador controlador) {
+    public Vista(Controlador c) {
         super("Compressor Huffman");
-        this.controlador = controlador;
+        controlador = c;
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());

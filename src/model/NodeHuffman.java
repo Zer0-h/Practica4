@@ -1,16 +1,16 @@
 package model;
 
 public class NodeHuffman implements Comparable<NodeHuffman> {
-    private final char simbol;
-    private final int frequencia;
+    private char simbol;
+    private int frequencia;
     private NodeHuffman esquerra;
     private NodeHuffman dreta;
 
-    public NodeHuffman(char simbol, int frequencia) {
-        this.simbol = simbol;
-        this.frequencia = frequencia;
-        this.esquerra = null;
-        this.dreta = null;
+    public NodeHuffman(char s, int f) {
+        simbol = s;
+        frequencia = f;
+        esquerra = null;
+        dreta = null;
     }
 
     public void setNodeEsquerra(NodeHuffman node) {
@@ -29,8 +29,16 @@ public class NodeHuffman implements Comparable<NodeHuffman> {
         return simbol;
     }
 
+    public void setSimbol(char value){
+        simbol = value;
+    }
+
     public int getFrequencia(){
         return frequencia;
+    }
+
+    public void setFrequencia(int value) {
+        frequencia = value;
     }
 
     public NodeHuffman getNodeEsquerra(){

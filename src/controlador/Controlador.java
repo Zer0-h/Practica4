@@ -6,7 +6,9 @@ import vista.Vista;
 
 import javax.swing.*;
 import java.io.File;
+import java.io.IOException;
 import model.Model;
+import model.NodeHuffman;
 
 public class Controlador implements Notificar {
 
@@ -32,6 +34,18 @@ public class Controlador implements Notificar {
             model.setFitxerOriginal(fitxer);
             vista.mostrarNomFitxerCarregat(fitxer.getName(), fitxer.length());
             notificar(Notificacio.FITXER_CARREGAT);
+
+            // Si és un .huff, reconstruïm l’arbre i el mostrem
+            if (fitxer.getName().toLowerCase().endsWith(".huff")) {
+                try {
+                    NodeHuffman arrel = servei.reconstruirArbreDesDeFitxerHuff(fitxer);
+                    model.setArrelHuffman(arrel);
+                    vista.getPanellArbre().setArrel(arrel);
+                    vista.getPanellArbre().repaint();
+                } catch (IOException e) {
+                    vista.mostrarMissatge("Error en llegir el fitxer .huff");
+                }
+            }
         }
     }
 

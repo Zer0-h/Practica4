@@ -5,6 +5,7 @@ import controlador.Notificacio;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,34 +37,24 @@ public class ServeiCompressio {
             File fitxerOriginal = model.getFitxerOriginal();
             long inici = System.nanoTime();
 
-            // Guardar fitxer .huff
-            try (FileOutputStream out = new FileOutputStream(fitxerSortida);
-                 ObjectOutputStream oos = new ObjectOutputStream(out)) {
+            // Construir la cadena codificada
+            StringBuilder codificat = new StringBuilder();
+            for (char c : textOriginal.toCharArray()) {
+                codificat.append(codis.get(c));
+            }
 
-                oos.writeObject(codis);
+            // Guardar fitxer amb taula codis (Base64) + cadena codificada
+            try (BufferedWriter escriptor = new BufferedWriter(new FileWriter(fitxerSortida))) {
+                for (Map.Entry<Character, String> entrada : codis.entrySet()) {
+                    String simbolCodificat = Base64.getEncoder().encodeToString(
+                            String.valueOf(entrada.getKey()).getBytes());
 
-                StringBuilder bits = new StringBuilder();
-                for (char c : textOriginal.toCharArray()) {
-                    bits.append(codis.get(c));
+                    escriptor.write(simbolCodificat + ":" + entrada.getValue() + ":" + freq.get(entrada.getKey()));
+                    escriptor.newLine();
                 }
-
-                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-                int index = 0;
-                while (index + 8 <= bits.length()) {
-                    String byteStr = bits.substring(index, index + 8);
-                    buffer.write((byte) Integer.parseInt(byteStr, 2));
-                    index += 8;
-                }
-
-                int restants = bits.length() - index;
-                int padding = 8 - restants;
-                if (restants > 0) {
-                    String byteStr = bits.substring(index) + "0".repeat(padding);
-                    buffer.write((byte) Integer.parseInt(byteStr, 2));
-                }
-
-                oos.writeInt(padding);
-                buffer.writeTo(out);
+                escriptor.write("#");
+                escriptor.newLine();
+                escriptor.write(codificat.toString());
             }
 
             long fi = System.nanoTime();
@@ -85,40 +76,32 @@ public class ServeiCompressio {
             controlador.notificar(Notificacio.ERROR);
         }
     }
-    
+
     public void descomprimir(File fitxerComprès, File fitxerSortida) {
-        try (FileInputStream in = new FileInputStream(fitxerComprès);
-             ObjectInputStream ois = new ObjectInputStream(in)) {
-
-            // 1. Llegim la taula de codis
-            Map<Character, String> codis = (Map<Character, String>) ois.readObject();
-
-            // 2. Construïm la taula inversa
+        try (BufferedReader lector = new BufferedReader(new FileReader(fitxerComprès))) {
             Map<String, Character> codisInvers = new HashMap<>();
-            for (Map.Entry<Character, String> entrada : codis.entrySet()) {
-                codisInvers.put(entrada.getValue(), entrada.getKey());
+            String linia;
+
+            // Llegim la taula de codis
+            while ((linia = lector.readLine()) != null && !linia.equals("#")) {
+                String[] parts = linia.split(":", 2);
+                if (parts.length == 3) {
+                    byte[] decoded = Base64.getDecoder().decode(parts[0]);
+                    char simbol = new String(decoded).charAt(0);
+                    codisInvers.put(parts[1], simbol);
+                }
             }
 
-            // 3. Llegim el padding i els bytes codificats
-            int padding = ois.readInt();
-            byte[] bytes = (byte[]) ois.readObject();
-
-            // 4. Convertim bytes a cadena de bits
-            StringBuilder bits = new StringBuilder();
-            for (byte bt : bytes) {
-                String binari = String.format("%8s", Integer.toBinaryString(bt & 0xFF)).replace(' ', '0');
-                bits.append(binari);
+            // Llegim la cadena codificada
+            StringBuilder codificat = new StringBuilder();
+            while ((linia = lector.readLine()) != null) {
+                codificat.append(linia);
             }
 
-            // 5. Eliminem padding final
-            if (padding > 0 && bits.length() >= padding) {
-                bits.setLength(bits.length() - padding);
-            }
-
-            // 6. Descodifiquem i escrivim el fitxer
-            StringBuilder buffer = new StringBuilder();
+            // Descodifiquem i escrivim el fitxer
             BufferedWriter escriptor = new BufferedWriter(new FileWriter(fitxerSortida));
-            for (char bit : bits.toString().toCharArray()) {
+            StringBuilder buffer = new StringBuilder();
+            for (char bit : codificat.toString().toCharArray()) {
                 buffer.append(bit);
                 if (codisInvers.containsKey(buffer.toString())) {
                     escriptor.write(codisInvers.get(buffer.toString()));
@@ -127,14 +110,14 @@ public class ServeiCompressio {
             }
             escriptor.close();
 
-            // 7. Notifiquem i guardam el fitxer al model
             controlador.getModel().setFitxerDescomprès(fitxerSortida);
             controlador.notificar(Notificacio.DESCOMPRESSIO_COMPLETA);
 
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException e) {
             controlador.notificar(Notificacio.ERROR);
         }
     }
+
 
     public Map<Character, Integer> calcularFrequencia(String contingut) {
         Map<Character, Integer> frequencia = new HashMap<>();
@@ -158,5 +141,59 @@ public class ServeiCompressio {
             total += ((double) f / totalFreq) * l;
         }
         return total;
+    }
+
+    public NodeHuffman reconstruirArbreDesDeFitxerHuff(File fitxer) throws IOException {
+        try (BufferedReader lector = new BufferedReader(new FileReader(fitxer))) {
+            Map<Character, String> codis = new HashMap<>();
+            Map<Character, Integer> frequencies = new HashMap<>();
+            String linia;
+
+            // Llegim taula de codis
+            while ((linia = lector.readLine()) != null && !linia.equals("#")) {
+                String[] parts = linia.split(":", 3);
+                if (parts.length == 3) {
+                    byte[] decoded = Base64.getDecoder().decode(parts[0]);
+                    char simbol = new String(decoded).charAt(0);
+                    String codi = parts[1];
+                    int freq = Integer.parseInt(parts[2]);
+                    codis.put(simbol, codi);
+                    frequencies.put(simbol, freq);
+                }
+            }
+
+            // Reconstruïm arbre des de la taula
+            return reconstruirArbreDesDeCodis(codis, frequencies);
+        }
+    }
+
+    // Reconstrucció de l'arbre a partir de la taula de codis
+    private NodeHuffman reconstruirArbreDesDeCodis(Map<Character, String> codis, Map<Character, Integer> frequencies) {
+        NodeHuffman arrel = new NodeHuffman('\0', 0);
+        for (Map.Entry<Character, String> entrada : codis.entrySet()) {
+            NodeHuffman actual = arrel;
+            String codi = entrada.getValue();
+            char simbol = entrada.getKey();
+
+            for (int i = 0; i < codi.length(); i++) {
+                char bit = codi.charAt(i);
+                if (bit == '0') {
+                    if (actual.getNodeEsquerra() == null) {
+                        actual.setNodeEsquerra(new NodeHuffman('\0', 0));
+                    }
+                    actual = actual.getNodeEsquerra();
+                } else {
+                    if (actual.getNodeDreta() == null) {
+                        actual.setNodeDreta(new NodeHuffman('\0', 0));
+                    }
+                    actual = actual.getNodeDreta();
+                }
+            }
+
+            // Estem a la fulla: fixem el símbol
+            actual.setSimbol(simbol);
+            actual.setFrequencia(frequencies.get(simbol));
+        }
+        return arrel;
     }
 }

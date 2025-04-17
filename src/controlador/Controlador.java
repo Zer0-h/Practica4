@@ -1,7 +1,6 @@
 package controlador;
 
 import model.ServeiCompressio;
-import model.TestFidelitat;
 import vista.Vista;
 
 import javax.swing.*;
@@ -31,13 +30,10 @@ public class Controlador implements Notificar {
         JFileChooser selector = new JFileChooser();
         if (selector.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
             File fitxer = selector.getSelectedFile();
-            model.setFitxerOriginal(fitxer);
-            vista.mostrarNomFitxerCarregat(fitxer.getName(), fitxer.length());
-            notificar(Notificacio.FITXER_CARREGAT);
 
-            // Si és un .huff, reconstruïm l’arbre i el mostrem
             if (fitxer.getName().toLowerCase().endsWith(".huff")) {
                 try {
+                    model.setFitxerComprès(fitxer);
                     NodeHuffman arrel = servei.reconstruirArbreDesDeFitxerHuff(fitxer);
                     model.setArrelHuffman(arrel);
                     vista.getPanellArbre().setArrel(arrel);
@@ -45,13 +41,17 @@ public class Controlador implements Notificar {
                 } catch (IOException e) {
                     vista.mostrarMissatge("Error en llegir el fitxer .huff");
                 }
+            } else {
+                model.setFitxerOriginal(fitxer);
+                vista.mostrarNomFitxerCarregat(fitxer.getName(), fitxer.length());
             }
+            notificar(Notificacio.FITXER_CARREGAT);
         }
     }
 
     public void comprimir() {
         if (model.getFitxerOriginal() == null) {
-            vista.mostrarMissatge("Primer has de carregar un fitxer.");
+            vista.mostrarMissatge("Primer has de carregar un fitxer per comprimir.");
             return;
         }
 
@@ -79,8 +79,6 @@ public class Controlador implements Notificar {
         try {
             servei.descomprimir(model.getFitxerComprès(), fitxerDescomprès);
             model.setFitxerDescomprès(fitxerDescomprès);
-            //vista.mostrarMissatge("Fitxer descomprimit correctament.");
-
 
             // Guardam
             JFileChooser selector = new JFileChooser();
@@ -112,30 +110,6 @@ public class Controlador implements Notificar {
             File desti = selector.getSelectedFile();
             model.getFitxerComprès().renameTo(desti);
             vista.mostrarMissatge("Fitxer guardat com: " + desti.getName());
-        }
-    }
-
-    public void testFidelitat() {
-        if (model.getFitxerOriginal() == null || model.getFitxerDescomprès() == null) {
-            vista.mostrarMissatge("Cal un fitxer original i un descomprimit per fer el test.");
-            return;
-        }
-
-        try {
-            boolean iguals = TestFidelitat.compararFitxers(
-                model.getFitxerOriginal(),
-                model.getFitxerDescomprès()
-            );
-            if (iguals) {
-                notificar(Notificacio.TEST_FIDELITAT_OK);
-                vista.mostrarMissatge("Els fitxers són idèntics.");
-            } else {
-                notificar(Notificacio.TEST_FIDELITAT_KO);
-                vista.mostrarMissatge("Els fitxers són diferents.");
-            }
-        } catch (Exception e) {
-            notificar(Notificacio.ERROR);
-            vista.mostrarMissatge("Error durant el test de fidelitat.");
         }
     }
 

@@ -84,7 +84,7 @@ public class ServeiCompressio {
 
             // Llegim la taula de codis
             while ((linia = lector.readLine()) != null && !linia.equals("#")) {
-                String[] parts = linia.split(":", 2);
+                String[] parts = linia.split(":", 3);
                 if (parts.length == 3) {
                     byte[] decoded = Base64.getDecoder().decode(parts[0]);
                     char simbol = new String(decoded).charAt(0);
@@ -143,6 +143,8 @@ public class ServeiCompressio {
         return total;
     }
 
+    // Reconstruir arbre
+
     public NodeHuffman reconstruirArbreDesDeFitxerHuff(File fitxer) throws IOException {
         try (BufferedReader lector = new BufferedReader(new FileReader(fitxer))) {
             Map<Character, String> codis = new HashMap<>();
@@ -171,9 +173,9 @@ public class ServeiCompressio {
 
     // Reconstrucció de l'arbre a partir de la taula de codis
     private NodeHuffman reconstruirArbreDesDeCodis(Map<Character, String> codis, Map<Character, Integer> frequencies) {
-        NodeHuffman arrel = new NodeHuffman('\0', 0);
+        NodeHuffman arrelArbre = new NodeHuffman('\0', 0);
         for (Map.Entry<Character, String> entrada : codis.entrySet()) {
-            NodeHuffman actual = arrel;
+            NodeHuffman actual = arrelArbre;
             String codi = entrada.getValue();
             char simbol = entrada.getKey();
 
@@ -196,7 +198,7 @@ public class ServeiCompressio {
             actual.setSimbol(simbol);
             actual.setFrequencia(frequencies.get(simbol));
         }
-        return arrel;
+        return arrelArbre;
     }
 
     private int propagarFrequencies(NodeHuffman node) {

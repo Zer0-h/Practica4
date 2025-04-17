@@ -13,6 +13,4 @@ public enum Notificacio {
     DESCOMPRESSIO_COMPLETA,
     ERROR,
     RESULTATS,
-    TEST_FIDELITAT_OK,
-    TEST_FIDELITAT_KO
 }

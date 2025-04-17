@@ -27,7 +27,6 @@ public class PanellBotons extends JPanel {
         botoComprimir.addActionListener(e -> controlador.comprimir());
         botoDescomprimir.addActionListener(e -> controlador.descomprimir());
         botoGuardar.addActionListener(e -> controlador.guardarFitxer());
-        botoTestFidelitat.addActionListener(e -> controlador.testFidelitat());
 
         add(botoCarregar);
         add(botoComprimir);

@@ -26,7 +26,7 @@ public class Controlador implements Notificar {
         vista.mostrar();
     }
 
-    public void carregarFitxer() {
+    public void carregaFitxer() {
         JFileChooser selector = new JFileChooser();
         if (selector.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
             File fitxer = selector.getSelectedFile();
@@ -36,8 +36,8 @@ public class Controlador implements Notificar {
                     model.setFitxerComprès(fitxer);
                     NodeHuffman arrel = servei.reconstruirArbreDesDeFitxerHuff(fitxer);
                     model.setArrelHuffman(arrel);
-                    vista.getPanellArbre().setArrel(arrel);
-                    vista.getPanellArbre().repaint();
+
+                    vista.notificar(Notificacio.PINTAR_ARBRE);
                 } catch (IOException e) {
                     vista.mostrarMissatge("Error en llegir el fitxer .huff");
                 }
@@ -45,7 +45,6 @@ public class Controlador implements Notificar {
                 model.setFitxerOriginal(fitxer);
                 vista.mostrarNomFitxerCarregat(fitxer.getName(), fitxer.length());
             }
-            notificar(Notificacio.FITXER_CARREGAT);
         }
     }
 
@@ -59,10 +58,6 @@ public class Controlador implements Notificar {
             String contingut = servei.llegirFitxer(model.getFitxerOriginal());
             File sortida = new File(model.getFitxerOriginal() + ".huff");
             servei.comprimir(contingut, sortida);
-            model.setFitxerComprès(sortida);
-            vista.getPanellArbre().setArrel(model.getArrelHuffman());
-            vista.getPanellArbre().repaint();
-            vista.mostrarEstadistiquesCompressio();
 
         } catch (Exception e) {
             vista.mostrarMissatge("Error durant la compressió.");
@@ -119,7 +114,19 @@ public class Controlador implements Notificar {
 
     @Override
     public void notificar(Notificacio notificacio) {
-        System.out.println("Notificació rebuda: " + notificacio);
-        // Aquí pots ampliar la gestió d’esdeveniments si ho necessites.
+        switch (notificacio) {
+            case Notificacio.CARREGA_FITXER ->
+                carregaFitxer();
+            case Notificacio.COMPRIMIR ->
+                comprimir();
+            case Notificacio.DESCOMPRIMIR ->
+                descomprimir();
+            case Notificacio.GUARDAR ->
+                guardarFitxer();
+            case Notificacio.COMPRESSIO_COMPLETA ->
+                vista.notificar(Notificacio.PINTAR_ARBRE);
+            case Notificacio.ERROR ->
+                vista.notificar(Notificacio.ERROR);
+        }
     }
 }

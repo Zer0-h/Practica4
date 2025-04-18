@@ -1,6 +1,7 @@
 package vista;
 
 import controlador.Controlador;
+import controlador.Notificacio;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,10 +21,10 @@ public class PanellBotons extends JPanel {
         botoDescomprimir = new JButton("Descomprimir");
         botoGuardar = new JButton("Guardar Comprimit");
 
-        botoCarregar.addActionListener(e -> controlador.carregarFitxer());
-        botoComprimir.addActionListener(e -> controlador.comprimir());
-        botoDescomprimir.addActionListener(e -> controlador.descomprimir());
-        botoGuardar.addActionListener(e -> controlador.guardarFitxer());
+        botoCarregar.addActionListener(e -> controlador.notificar(Notificacio.CARREGA_FITXER));
+        botoComprimir.addActionListener(e -> controlador.notificar(Notificacio.COMPRIMIR));
+        botoDescomprimir.addActionListener(e -> controlador.notificar(Notificacio.DESCOMPRIMIR));
+        botoGuardar.addActionListener(e -> controlador.notificar(Notificacio.GUARDAR));
 
         add(botoCarregar);
         add(botoComprimir);

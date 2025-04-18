@@ -37,24 +37,40 @@ public class ServeiCompressio {
             File fitxerOriginal = model.getFitxerOriginal();
             long inici = System.nanoTime();
 
-            // Construir la cadena codificada
-            StringBuilder codificat = new StringBuilder();
+            // Construir cadena codificada
+            StringBuilder bitsStr = new StringBuilder();
             for (char c : textOriginal.toCharArray()) {
-                codificat.append(codis.get(c));
+                bitsStr.append(codis.get(c));
             }
 
-            // Guardar fitxer amb taula codis (Base64) + cadena codificada
+            // Convertir la cadena de bits a byte[]
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            int i = 0;
+            while (i + 8 <= bitsStr.length()) {
+                String byteStr = bitsStr.substring(i, i + 8);
+                buffer.write(Integer.parseInt(byteStr, 2));
+                i += 8;
+            }
+            int padding = 0;
+            if (i < bitsStr.length()) {
+                String lastBits = bitsStr.substring(i);
+                padding = 8 - lastBits.length();
+                lastBits += "0".repeat(padding);
+                buffer.write(Integer.parseInt(lastBits, 2));
+            }
+            String bitsBase64 = Base64.getEncoder().encodeToString(buffer.toByteArray());
+
+            // Escriure al fitxer .huff
             try (BufferedWriter escriptor = new BufferedWriter(new FileWriter(fitxerSortida))) {
                 for (Map.Entry<Character, String> entrada : codis.entrySet()) {
                     String simbolCodificat = Base64.getEncoder().encodeToString(
                             String.valueOf(entrada.getKey()).getBytes());
-
                     escriptor.write(simbolCodificat + ":" + entrada.getValue() + ":" + freq.get(entrada.getKey()));
                     escriptor.newLine();
                 }
-                escriptor.write("#");
-                escriptor.newLine();
-                escriptor.write(codificat.toString());
+                escriptor.write("#\n");
+                escriptor.write(padding + "\n");
+                escriptor.write(bitsBase64);
             }
 
             long fi = System.nanoTime();
@@ -69,20 +85,23 @@ public class ServeiCompressio {
 
             double longitudMitjana = calcularLongitudMitjana(freq, codis);
             model.setLongitudMitjanaCodi(longitudMitjana);
+            model.setFitxerComprès(fitxerSortida);
 
             controlador.notificar(Notificacio.COMPRESSIO_COMPLETA);
 
         } catch (IOException e) {
+            System.out.println("Hi ha ocorregut un error" + e.getMessage());
             controlador.notificar(Notificacio.ERROR);
         }
     }
+
 
     public void descomprimir(File fitxerComprès, File fitxerSortida) {
         try (BufferedReader lector = new BufferedReader(new FileReader(fitxerComprès))) {
             Map<String, Character> codisInvers = new HashMap<>();
             String linia;
 
-            // Llegim la taula de codis
+            // Llegim taula de codis
             while ((linia = lector.readLine()) != null && !linia.equals("#")) {
                 String[] parts = linia.split(":", 3);
                 if (parts.length == 3) {
@@ -92,16 +111,24 @@ public class ServeiCompressio {
                 }
             }
 
-            // Llegim la cadena codificada
-            StringBuilder codificat = new StringBuilder();
-            while ((linia = lector.readLine()) != null) {
-                codificat.append(linia);
-            }
+            // Padding
+            int padding = Integer.parseInt(lector.readLine());
 
-            // Descodifiquem i escrivim el fitxer
+            // Bits codificats (en Base64)
+            String encodedBits = lector.readLine();
+            byte[] bytes = Base64.getDecoder().decode(encodedBits);
+
+            // Convertir a cadena de bits
+            StringBuilder bits = new StringBuilder();
+            for (byte b : bytes) {
+                bits.append(String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0'));
+            }
+            bits.setLength(bits.length() - padding);
+
+            // Descodificació
             BufferedWriter escriptor = new BufferedWriter(new FileWriter(fitxerSortida));
             StringBuilder buffer = new StringBuilder();
-            for (char bit : codificat.toString().toCharArray()) {
+            for (char bit : bits.toString().toCharArray()) {
                 buffer.append(bit);
                 if (codisInvers.containsKey(buffer.toString())) {
                     escriptor.write(codisInvers.get(buffer.toString()));
@@ -114,10 +141,10 @@ public class ServeiCompressio {
             controlador.notificar(Notificacio.DESCOMPRESSIO_COMPLETA);
 
         } catch (IOException e) {
+            System.out.println("Hi ha ocorregut un error" + e.getMessage());
             controlador.notificar(Notificacio.ERROR);
         }
     }
-
 
     public Map<Character, Integer> calcularFrequencia(String contingut) {
         Map<Character, Integer> frequencia = new HashMap<>();

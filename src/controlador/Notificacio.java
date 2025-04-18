@@ -8,9 +8,12 @@ package controlador;
  * @author tonitorres
  */
 public enum Notificacio {
-    FITXER_CARREGAT,
+    CARREGA_FITXER,
+    COMPRIMIR,
+    DESCOMPRIMIR,
+    GUARDAR,
     COMPRESSIO_COMPLETA,
     DESCOMPRESSIO_COMPLETA,
-    ERROR,
-    RESULTATS,
+    PINTAR_ARBRE,
+    ERROR
 }

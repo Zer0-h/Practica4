@@ -3,19 +3,18 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/C:/Users/Zer0/Documents/GitHub/Practica4/src/controlador/Controlador.java</file>
+            <file>file:/C:/Users/Zer0/Documents/GitHub/Practica4/src/vista/NodeVisual.java</file>
+            <file>file:/C:/Users/Zer0/Documents/GitHub/Practica4/src/model/ServeiCompressio.java</file>
+            <file>file:/C:/Users/Zer0/Documents/GitHub/Practica4/src/vista/PanellEstadistiques.java</file>
             <file>file:/C:/Users/Zer0/Documents/GitHub/Practica4/src/vista/PanellArbre.java</file>
             <file>file:/C:/Users/Zer0/Documents/GitHub/Practica4/src/model/NodeHuffman.java</file>
             <file>file:/C:/Users/Zer0/Documents/GitHub/Practica4/src/controlador/Notificacio.java</file>
+            <file>file:/C:/Users/Zer0/Documents/GitHub/Practica4/src/model/ArbreHuffman.java</file>
             <file>file:/C:/Users/Zer0/Documents/GitHub/Practica4/src/vista/Vista.java</file>
             <file>file:/C:/Users/Zer0/Documents/GitHub/Practica4/src/vista/PanellBotons.java</file>
             <file>file:/C:/Users/Zer0/Documents/GitHub/Practica4/src/model/Model.java</file>
-            <file>file:/C:/Users/Zer0/Documents/GitHub/Practica4/src/controlador/Controlador.java</file>
-            <file>file:/C:/Users/Zer0/Documents/GitHub/Practica4/src/vista/NodeVisual.java</file>
-            <file>file:/C:/Users/Zer0/Documents/GitHub/Practica4/src/model/TestFidelitat.java</file>
-            <file>file:/C:/Users/Zer0/Documents/GitHub/Practica4/src/model/ServeiCompressio.java</file>
-            <file>file:/C:/Users/Zer0/Documents/GitHub/Practica4/src/vista/PanellEstadistiques.java</file>
-            <file>file:/C:/Users/Zer0/Documents/GitHub/Practica4/src/model/UtilitatsFitxer.java</file>
-            <file>file:/C:/Users/Zer0/Documents/GitHub/Practica4/src/model/ArbreHuffman.java</file>
+            <file>file:/C:/Users/Zer0/Documents/GitHub/Practica4/src/controlador/Notificar.java</file>
         </group>
     </open-files>
 </project-private>

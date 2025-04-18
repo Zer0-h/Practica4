@@ -1,12 +1,14 @@
 package vista;
 
 import controlador.Controlador;
+import controlador.Notificacio;
+import controlador.Notificar;
 
 import javax.swing.*;
 import java.awt.*;
 import model.Model;
 
-public class Vista extends JFrame {
+public class Vista extends JFrame implements Notificar {
 
     private final Controlador controlador;
     private final PanellBotons panellBotons;
@@ -29,7 +31,7 @@ public class Vista extends JFrame {
         add(panellEstadistiques, BorderLayout.SOUTH);
 
         setSize(800, 600);
-        setLocationRelativeTo(null); // Centrat
+        setLocationRelativeTo(null);
     }
 
     public void mostrar() {
@@ -62,7 +64,23 @@ public class Vista extends JFrame {
         panellEstadistiques.mostrarNomIFitxer(nom, mida);
     }
 
-    public PanellArbre getPanellArbre() {
-        return panellArbre;
+    public void pintarArbre() {
+        panellArbre.setArrel(controlador.getModel().getArrelHuffman());
+        panellArbre.repaint();
+        mostrarEstadistiquesCompressio();
+    }
+
+    public void error() {
+        JOptionPane.showMessageDialog(this, "Hi ha hagut un error a l'hora de comprimir o descomprimir el fixter, la referència a l'error estirà a la consola.");
+    }
+
+    @Override
+    public void notificar(Notificacio notificacio) {
+        switch (notificacio) {
+            case Notificacio.PINTAR_ARBRE ->
+                pintarArbre();
+            case Notificacio.ERROR ->
+                error();
+        }
     }
 }

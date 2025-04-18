@@ -32,14 +32,11 @@ public class Vista extends JFrame implements Notificar {
 
         setSize(800, 600);
         setLocationRelativeTo(null);
-    }
-
-    public void mostrar() {
         setVisible(true);
     }
 
-    public void mostrarMissatge(String missatge) {
-        JOptionPane.showMessageDialog(this, missatge);
+    public void mostrarMissatge() {
+        JOptionPane.showMessageDialog(this, controlador.getModel().getMissatge());
     }
 
     public void mostrarEstadistiquesCompressio() {
@@ -77,10 +74,12 @@ public class Vista extends JFrame implements Notificar {
     @Override
     public void notificar(Notificacio notificacio) {
         switch (notificacio) {
-            case Notificacio.PINTAR_ARBRE ->
+            case PINTAR_ARBRE ->
                 pintarArbre();
-            case Notificacio.ERROR ->
+            case ERROR ->
                 error();
+            case MOSTRAR_MISSATGE ->
+                mostrarMissatge();
         }
     }
 }

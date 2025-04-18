@@ -21,9 +21,8 @@ public class Controlador implements Notificar {
 
     public void inicialitzar() {
         servei = new ServeiCompressio(this);
-        vista = new Vista(this);
         model = new Model();
-        vista.mostrar();
+        vista = new Vista(this);
     }
 
     public void carregaFitxer() {
@@ -39,7 +38,8 @@ public class Controlador implements Notificar {
 
                     vista.notificar(Notificacio.PINTAR_ARBRE);
                 } catch (IOException e) {
-                    vista.mostrarMissatge("Error en llegir el fitxer .huff");
+                    model.setMissatge("Error en llegir el fitxer .huff");
+                    vista.notificar(Notificacio.MOSTRAR_MISSATGE);
                 }
             } else {
                 model.setFitxerOriginal(fitxer);
@@ -50,7 +50,8 @@ public class Controlador implements Notificar {
 
     public void comprimir() {
         if (model.getFitxerOriginal() == null) {
-            vista.mostrarMissatge("Primer has de carregar un fitxer per comprimir.");
+            model.setMissatge("Primer has de carregar un fitxer per comprimir.");
+            vista.notificar(Notificacio.MOSTRAR_MISSATGE);
             return;
         }
 
@@ -60,13 +61,15 @@ public class Controlador implements Notificar {
             servei.comprimir(contingut, sortida);
 
         } catch (Exception e) {
-            vista.mostrarMissatge("Error durant la compressió.");
+            model.setMissatge("Error durant la compressió.");
+            vista.notificar(Notificacio.MOSTRAR_MISSATGE);
         }
     }
 
     public void descomprimir() {
         if (model.getFitxerComprès() == null) {
-            vista.mostrarMissatge("Has de comprimir o carregar un fitxer .huff primer.");
+            model.setMissatge("Has de comprimir o carregar un fitxer .huff primer.");
+            vista.notificar(Notificacio.MOSTRAR_MISSATGE);
             return;
         }
 
@@ -83,17 +86,20 @@ public class Controlador implements Notificar {
             if (resultat == JFileChooser.APPROVE_OPTION) {
                 File desti = selector.getSelectedFile();
                 model.getFitxerDescomprès().renameTo(desti);
-                vista.mostrarMissatge("Fitxer guardat com: " + desti.getName());
+                model.setMissatge("Fitxer guardat com: " + desti.getName());
+                vista.notificar(Notificacio.MOSTRAR_MISSATGE);
             }
 
         } catch (Exception e) {
-            vista.mostrarMissatge("Error durant la descompressió.");
+                                    model.setMissatge("Error durant la descompressió.");
+            vista.notificar(Notificacio.MOSTRAR_MISSATGE);
         }
     }
 
     public void guardarFitxer() {
         if (model.getFitxerComprès() == null) {
-            vista.mostrarMissatge("Cap fitxer comprimit per guardar.");
+            model.setMissatge("Cap fitxer comprimit per guardar.");
+            vista.notificar(Notificacio.MOSTRAR_MISSATGE);
             return;
         }
 
@@ -104,7 +110,8 @@ public class Controlador implements Notificar {
         if (resultat == JFileChooser.APPROVE_OPTION) {
             File desti = selector.getSelectedFile();
             model.getFitxerComprès().renameTo(desti);
-            vista.mostrarMissatge("Fitxer guardat com: " + desti.getName());
+            model.setMissatge("Fitxer guardat com: " + desti.getName());
+            vista.notificar(Notificacio.MOSTRAR_MISSATGE);
         }
     }
 

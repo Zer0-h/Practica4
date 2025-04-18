@@ -12,6 +12,7 @@ public class Model {
     private long tempsCompressioMs;
     private double longitudMitjanaCodi;
     private double taxaCompressio;
+    private String missatgeInformatiu;
 
     private NodeHuffman arrelHuffman;
 
@@ -86,4 +87,8 @@ public class Model {
             taxaCompressio
         );
     }
+
+    public String getMissatge() { return missatgeInformatiu; }
+    public void setMissatge(String value) { missatgeInformatiu = value; }
+
 }

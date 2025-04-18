@@ -15,5 +15,6 @@ public enum Notificacio {
     COMPRESSIO_COMPLETA,
     DESCOMPRESSIO_COMPLETA,
     PINTAR_ARBRE,
-    ERROR
+    ERROR,
+    MOSTRAR_MISSATGE,
 }

@@ -56,9 +56,8 @@ public class Controlador implements Notificar {
         }
 
         try {
-            String contingut = servei.llegirFitxer(model.getFitxerOriginal());
             File sortida = new File(model.getFitxerOriginal() + ".huff");
-            servei.comprimir(contingut, sortida);
+            servei.comprimir(model.getFitxerOriginal(), sortida);
 
         } catch (Exception e) {
             model.setMissatge("Error durant la compressió.");

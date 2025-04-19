@@ -5,14 +5,15 @@ import java.util.*;
 public class ArbreHuffman {
 
     public ArbreHuffman() {
-        
+
     }
 
-    public NodeHuffman construirArbre(Map<Character, Integer> frequenciaSimbols) {
+    public NodeHuffman construirArbreBytes(Map<Byte, Integer> freqBytes) {
         PriorityQueue<NodeHuffman> cua = new PriorityQueue<>();
-
-        for (var entrada : frequenciaSimbols.entrySet()) {
-            cua.add(new NodeHuffman(entrada.getKey(), entrada.getValue()));
+        for (var entrada : freqBytes.entrySet()) {
+            byte b = entrada.getKey();
+            int freq = entrada.getValue();
+            cua.add(new NodeHuffman((char) (b & 0xFF), freq));
         }
 
         while (cua.size() > 1) {
@@ -24,17 +25,17 @@ public class ArbreHuffman {
             cua.add(pare);
         }
 
-        return cua.poll(); // Arrel de l’arbre
+        return cua.poll();
     }
 
-    public void generarCodis(NodeHuffman arrel, String codiActual, Map<Character, String> codis) {
+    public void generarCodisBytes(NodeHuffman arrel, String codiActual, Map<Byte, String> codis) {
         if (arrel == null) return;
 
         if (arrel.esFulla()) {
-            codis.put(arrel.getSimbol(), codiActual);
+            codis.put((byte) arrel.getSimbol(), codiActual);
         } else {
-            generarCodis(arrel.getNodeEsquerra(), codiActual + "0", codis);
-            generarCodis(arrel.getNodeDreta(), codiActual + "1", codis);
+            generarCodisBytes(arrel.getNodeEsquerra(), codiActual + "0", codis);
+            generarCodisBytes(arrel.getNodeDreta(), codiActual + "1", codis);
         }
     }
 }

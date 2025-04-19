@@ -41,12 +41,13 @@ public class ServeiCompressio {
 
             long inici = System.nanoTime();
 
-            // Codificar les dades a bits
+            // Codificar dades a bits
             StringBuilder bitsStr = new StringBuilder();
             for (byte b : dades) {
                 bitsStr.append(codis.get(b));
             }
 
+            // Convertir bits a byte[]
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
             int i = 0;
             while (i + 8 <= bitsStr.length()) {
@@ -61,21 +62,39 @@ public class ServeiCompressio {
                 lastBits += "0".repeat(padding);
                 buffer.write(Integer.parseInt(lastBits, 2));
             }
-            String bitsBase64 = Base64.getEncoder().encodeToString(buffer.toByteArray());
 
-            // Escriure fitxer comprimit
-            try (BufferedWriter escriptor = new BufferedWriter(new FileWriter(fitxerSortida))) {
+            // Escriure al fitxer binari
+            try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(fitxerSortida))) {
+                dos.writeInt(codis.size());
+
                 for (Map.Entry<Byte, String> entrada : codis.entrySet()) {
-                    String byteCodificat = Base64.getEncoder().encodeToString(new byte[]{entrada.getKey()});
-                    escriptor.write(byteCodificat + ":" + entrada.getValue() + ":" + freq.get(entrada.getKey()));
-                    escriptor.newLine();
+                    byte simbol = entrada.getKey();
+                    String codi = entrada.getValue();
+                    int llargada = codi.length();
+
+                    dos.writeByte(simbol);
+                    dos.writeByte(llargada);
+
+                    int index = 0;
+                    while (index + 8 <= codi.length()) {
+                        String byteStr = codi.substring(index, index + 8);
+                        dos.writeByte(Integer.parseInt(byteStr, 2));
+                        index += 8;
+                    }
+
+                    if (index < codi.length()) {
+                        String restant = codi.substring(index);
+                        restant += "0".repeat(8 - restant.length());
+                        dos.writeByte(Integer.parseInt(restant, 2));
+                    }
                 }
-                escriptor.write("#\n");
-                escriptor.write(padding + "\n");
-                escriptor.write(bitsBase64);
+
+                dos.writeByte(padding);
+                dos.write(buffer.toByteArray());
             }
 
             long fi = System.nanoTime();
+
             model.setFitxerComprès(fitxerSortida);
             model.setTempsCompressioMs((fi - inici) / 1_000_000);
 
@@ -83,8 +102,8 @@ public class ServeiCompressio {
             long midaComprimida = fitxerSortida.length();
             double taxa = (1.0 - ((double) midaComprimida / midaOriginal)) * 100;
             model.setTaxaCompressio(taxa);
-
             model.setLongitudMitjanaCodi(calcularLongitudMitjana(freq, codis));
+
             controlador.notificar(Notificacio.COMPRESSIO_COMPLETA);
 
         } catch (IOException e) {
@@ -93,25 +112,34 @@ public class ServeiCompressio {
     }
 
     public void descomprimir(File fitxerComprès, File fitxerSortida) {
-        try (BufferedReader lector = new BufferedReader(new FileReader(fitxerComprès))) {
+        try (DataInputStream dis = new DataInputStream(new FileInputStream(fitxerComprès))) {
+            int midaTaula = dis.readInt();
             Map<String, Byte> codisInvers = new HashMap<>();
-            String linia;
 
-            // Llegim la taula de codis
-            while ((linia = lector.readLine()) != null && !linia.equals("#")) {
-                String[] parts = linia.split(":", 3);
-                if (parts.length == 3) {
-                    byte[] simbol = Base64.getDecoder().decode(parts[0]);
-                    codisInvers.put(parts[1], simbol[0]);
+            for (int i = 0; i < midaTaula; i++) {
+                byte simbol = dis.readByte();
+                int llargada = dis.readByte();
+                int numBytes = (int) Math.ceil(llargada / 8.0);
+                byte[] codiBytes = new byte[numBytes];
+                dis.readFully(codiBytes);
+
+                StringBuilder bits = new StringBuilder();
+                for (byte b : codiBytes) {
+                    bits.append(String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0'));
                 }
+                String codi = bits.substring(0, llargada);
+                codisInvers.put(codi, simbol);
             }
 
-            int padding = Integer.parseInt(lector.readLine());
-            String encodedBits = lector.readLine();
-            byte[] bytes = Base64.getDecoder().decode(encodedBits);
+            int padding = dis.readByte();
+
+            ByteArrayOutputStream dades = new ByteArrayOutputStream();
+            while (dis.available() > 0) {
+                dades.write(dis.readByte());
+            }
 
             StringBuilder bits = new StringBuilder();
-            for (byte b : bytes) {
+            for (byte b : dades.toByteArray()) {
                 bits.append(String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0'));
             }
             bits.setLength(bits.length() - padding);
@@ -134,7 +162,6 @@ public class ServeiCompressio {
             controlador.notificar(Notificacio.ERROR);
         }
     }
-
     public NodeHuffman getArrel() {
         return arrel;
     }
@@ -162,38 +189,42 @@ public class ServeiCompressio {
     // Reconstruir arbre
 
     public NodeHuffman reconstruirArbreDesDeFitxerHuff(File fitxer) throws IOException {
-        try (BufferedReader lector = new BufferedReader(new FileReader(fitxer))) {
-            Map<Character, String> codis = new HashMap<>();
-            Map<Character, Integer> frequencies = new HashMap<>();
-            String linia;
+        try (DataInputStream dis = new DataInputStream(new FileInputStream(fitxer))) {
+            int midaTaula = dis.readInt();
+            Map<Byte, String> codis = new HashMap<>();
+            Map<Byte, Integer> freq = new HashMap<>(); // només si vols propagar després
 
-            // Llegim taula de codis
-            while ((linia = lector.readLine()) != null && !linia.equals("#")) {
-                String[] parts = linia.split(":", 3);
-                if (parts.length == 3) {
-                    byte[] decoded = Base64.getDecoder().decode(parts[0]);
-                    char simbol = new String(decoded).charAt(0);
-                    String codi = parts[1];
-                    int freq = Integer.parseInt(parts[2]);
-                    codis.put(simbol, codi);
-                    frequencies.put(simbol, freq);
+            for (int i = 0; i < midaTaula; i++) {
+                byte simbol = dis.readByte();
+                int llargada = dis.readByte();
+                int numBytes = (int) Math.ceil(llargada / 8.0);
+                byte[] codiBytes = new byte[numBytes];
+                dis.readFully(codiBytes);
+
+                StringBuilder bits = new StringBuilder();
+                for (byte b : codiBytes) {
+                    bits.append(String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0'));
                 }
+                String codi = bits.substring(0, llargada);
+                codis.put(simbol, codi);
+                freq.put(simbol, 0); // podries ignorar si no les tens
             }
 
-            NodeHuffman arrelArbre = reconstruirArbreDesDeCodis(codis, frequencies);
-            propagarFrequencies(arrelArbre);
-
-            return arrelArbre;
+            NodeHuffman arrel = reconstruirArbreDesDeCodis(codis);
+            propagarFrequencies(arrel); // opcional, si vols mostrar freqüències als interns
+            return arrel;
         }
     }
 
+
     // Reconstrucció de l'arbre a partir de la taula de codis
-    private NodeHuffman reconstruirArbreDesDeCodis(Map<Character, String> codis, Map<Character, Integer> frequencies) {
-        NodeHuffman arrelArbre = new NodeHuffman('\0', 0);
-        for (Map.Entry<Character, String> entrada : codis.entrySet()) {
-            NodeHuffman actual = arrelArbre;
+    private NodeHuffman reconstruirArbreDesDeCodis(Map<Byte, String> codis) {
+        NodeHuffman arrel = new NodeHuffman('\0', 0);
+
+        for (Map.Entry<Byte, String> entrada : codis.entrySet()) {
+            NodeHuffman actual = arrel;
             String codi = entrada.getValue();
-            char simbol = entrada.getKey();
+            byte simbol = entrada.getKey();
 
             for (int i = 0; i < codi.length(); i++) {
                 char bit = codi.charAt(i);
@@ -210,23 +241,22 @@ public class ServeiCompressio {
                 }
             }
 
-            // Estem a la fulla: fixem el símbol
-            actual.setSimbol(simbol);
-            actual.setFrequencia(frequencies.get(simbol));
+            actual.setSimbol((char)(simbol & 0xFF)); // conversió segura
         }
-        return arrelArbre;
+
+        return arrel;
     }
+
 
     private int propagarFrequencies(NodeHuffman node) {
         if (node == null) return 0;
-        if (node.esFulla()) return node.getFrequencia();
+        if (node.esFulla()) return 1;
 
-        int freqEsq = propagarFrequencies(node.getNodeEsquerra());
-        int freqDret = propagarFrequencies(node.getNodeDreta());
+        int fE = propagarFrequencies(node.getNodeEsquerra());
+        int fD = propagarFrequencies(node.getNodeDreta());
 
-        int total = freqEsq + freqDret;
-        node.setFrequencia(total);
-        return total;
+        node.setFrequencia(fE + fD);
+        return fE + fD;
     }
 
 }

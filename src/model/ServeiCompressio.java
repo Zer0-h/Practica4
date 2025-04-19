@@ -187,12 +187,10 @@ public class ServeiCompressio {
     }
 
     // Reconstruir arbre
-
     public NodeHuffman reconstruirArbreDesDeFitxerHuff(File fitxer) throws IOException {
         try (DataInputStream dis = new DataInputStream(new FileInputStream(fitxer))) {
             int midaTaula = dis.readInt();
             Map<Byte, String> codis = new HashMap<>();
-            Map<Byte, Integer> freq = new HashMap<>(); // només si vols propagar després
 
             for (int i = 0; i < midaTaula; i++) {
                 byte simbol = dis.readByte();
@@ -207,12 +205,9 @@ public class ServeiCompressio {
                 }
                 String codi = bits.substring(0, llargada);
                 codis.put(simbol, codi);
-                freq.put(simbol, 0); // podries ignorar si no les tens
             }
 
-            NodeHuffman arrel = reconstruirArbreDesDeCodis(codis);
-            propagarFrequencies(arrel); // opcional, si vols mostrar freqüències als interns
-            return arrel;
+            return reconstruirArbreDesDeCodis(codis);
         }
     }
 
@@ -246,17 +241,4 @@ public class ServeiCompressio {
 
         return arrel;
     }
-
-
-    private int propagarFrequencies(NodeHuffman node) {
-        if (node == null) return 0;
-        if (node.esFulla()) return 1;
-
-        int fE = propagarFrequencies(node.getNodeEsquerra());
-        int fD = propagarFrequencies(node.getNodeDreta());
-
-        node.setFrequencia(fE + fD);
-        return fE + fD;
-    }
-
 }

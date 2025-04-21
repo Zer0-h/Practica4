@@ -1,6 +1,7 @@
 package model;
 
 import java.io.File;
+import model.cua.*;
 
 /**
  * Classe que encapsula l'estat de l'aplicació: fitxers implicats en la compressió.
@@ -13,8 +14,26 @@ public class Model {
     private double longitudMitjanaCodi;
     private double taxaCompressio;
     private String missatgeInformatiu;
+    private TipusCua tipusCua;
 
     private NodeHuffman arrelHuffman;
+
+    public Model() {
+        tipusCua = TipusCua.HEAP;
+    }
+
+    public Cua crearCua() {
+        return switch (tipusCua) {
+            case HEAP -> new CuaHeap();
+            case ORDENADA -> new LlistaOrdenada();
+            case NO_ORDENADA -> new LlistaNoOrdenada();
+            default -> new CuaHeap();
+        };
+    }
+
+    public void setTipusCua(TipusCua value) {
+        tipusCua = value;
+    }
 
     public long getTempsCompressioMs() {
         return tempsCompressioMs;

@@ -7,6 +7,8 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
+import model.cua.Cua;
+import model.cua.CuaHeap;
 
 public class ServeiCompressio {
 
@@ -29,7 +31,7 @@ public class ServeiCompressio {
             Map<Byte, Integer> freq = calcularFrequencia(dades);
 
             // Codificació
-            CodificadorHuffman codificador = new CodificadorHuffman();
+            CodificadorHuffman codificador = new CodificadorHuffman(model.crearCua());
             NodeHuffman arrel = codificador.construirArbre(freq);
             Map<Byte, String> codis = codificador.generarCodis(arrel);
             int[] padding = new int[1];

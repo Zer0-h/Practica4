@@ -4,27 +4,33 @@ import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
+import model.cua.Cua;
 
 public class CodificadorHuffman {
 
+    private final Cua cua;
+
+    public CodificadorHuffman(Cua c) {
+        cua = c;
+    }
+
     public NodeHuffman construirArbre(Map<Byte, Integer> freq) {
-        PriorityQueue<NodeHuffman> cua = new PriorityQueue<>();
         for (var entrada : freq.entrySet()) {
             byte b = entrada.getKey();
             int f = entrada.getValue();
-            cua.add(new NodeHuffman((char) (b & 0xFF), f));
+            cua.afegir(new NodeHuffman((char) (b & 0xFF), f));
         }
 
-        while (cua.size() > 1) {
-            NodeHuffman n1 = cua.poll();
-            NodeHuffman n2 = cua.poll();
+        while (cua.mida()> 1) {
+            NodeHuffman n1 = cua.extreure();
+            NodeHuffman n2 = cua.extreure();
             NodeHuffman pare = new NodeHuffman('\0', n1.getFrequencia() + n2.getFrequencia());
             pare.setNodeEsquerra(n1);
             pare.setNodeDreta(n2);
-            cua.add(pare);
+            cua.afegir(pare);
         }
 
-        return cua.poll();
+        return cua.extreure();
     }
 
     public Map<Byte, String> generarCodis(NodeHuffman arrel) {

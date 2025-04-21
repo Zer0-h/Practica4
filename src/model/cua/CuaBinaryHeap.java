@@ -1,144 +1,100 @@
 package model.cua;
 
-import java.util.Arrays;
 import model.NodeHuffman;
-import java.util.PriorityQueue;
+import java.util.Arrays;
 
 public class CuaBinaryHeap implements CuaPrioritat {
-     // Array representation of the heap
-    private NodeHuffman[] heap;
 
-      // Number of elements currently in the heap
-    private int size;
+    private NodeHuffman[] monticle;
+    private int mida;
+    private int capacitat;
 
-      // Maximum number of elements the heap can hold
-    private int capacity;
-
-    // Constructor to initialize the heap with a given capacity
-    public CuaBinaryHeap(int c) {
-        capacity = c;
-        heap = new NodeHuffman[capacity];
-        size = 0;
+    public CuaBinaryHeap(int capacitatInicial) {
+        capacitat = capacitatInicial;
+        monticle = new NodeHuffman[capacitat];
+        mida = 0;
     }
-
 
     @Override
     public void afegir(NodeHuffman node) {
-        if (size >= capacity) {
-              // Resize the heap if capacity is reached
-            resize();
+        if (mida >= capacitat) {
+            redimensionar();
         }
 
-          // Place the new value at the end of the heap
-        heap[size] = node;
+        monticle[mida] = node;
+        int actual = mida;
+        mida++;
 
-          // Index of the newly added element
-        int current = size;
-
-          // Increase the size of the heap
-        size++;
-
-        // Restore the heap property by "heapifying up"
-        while (current > 0 && heap[current].getFrequencia() < heap[parent(current)].getFrequencia()) {
-              // Swap with the parent if smaller
-            swap(current, parent(current));
-
-              // Move up to the parent's position
-            current = parent(current);
+        while (actual > 0 && monticle[actual].getFrequencia() < monticle[pare(actual)].getFrequencia()) {
+            intercanviar(actual, pare(actual));
+            actual = pare(actual);
         }
     }
 
     @Override
     public NodeHuffman extreure() {
-        if (size == 0) {
-            // Check if the heap is empty
-            throw new RuntimeException("Heap is empty!");
+        if (mida == 0) {
+            throw new RuntimeException("El monticle és buit");
         }
 
-        // The root of the heap is the minimum element
-        NodeHuffman min = heap[0];
+        NodeHuffman minim = monticle[0];
+        monticle[0] = monticle[mida - 1];
+        mida--;
 
-        // Replace the root with the last element in the heap
-        heap[0] = heap[size - 1];
-        size--;
+        reorganitzarAvall(0);
 
-          // Restore the heap property by "heapifying down" from the root
-        heapifyDown(0);
-
-          // Return the extracted minimum element
-        return min;
+        return minim;
     }
 
     @Override
     public int mida() {
-        return size;
+        return mida;
     }
 
     @Override
     public boolean esBuida() {
-        return size == 0;
+        return mida == 0;
     }
 
-        // Method to get the index of the
-      // parent of a given node
-    private int parent(int i) {
+    private int pare(int i) {
         return (i - 1) / 2;
     }
 
-    // Method to get the index of the
-      // left child of a given node
-    private int leftChild(int i) {
+    private int esquerra(int i) {
         return 2 * i + 1;
     }
 
-    // Method to get the index of the
-      // right child of a given node
-    private int rightChild(int i) {
+    private int dreta(int i) {
         return 2 * i + 2;
     }
 
-    // Method to swap two elements in the heap array
-    private void swap(int i, int j) {
-        NodeHuffman temp = heap[i];
-        heap[i] = heap[j];
-        heap[j] = temp;
+    private void intercanviar(int i, int j) {
+        NodeHuffman temp = monticle[i];
+        monticle[i] = monticle[j];
+        monticle[j] = temp;
     }
 
-    // Method to resize the heap array when capacity is reached
-    private void resize() {
-        capacity *= 2;
-        heap = Arrays.copyOf(heap, capacity);
+    private void redimensionar() {
+        capacitat *= 2;
+        monticle = Arrays.copyOf(monticle, capacitat);
     }
 
-        // Method to restore the heap property by
-       // "heapifying down" from a given index
-    private void heapifyDown(int i) {
-           // Assume the current index is the smallest
-        int smallest = i;
+    private void reorganitzarAvall(int i) {
+        int menor = i;
+        int esq = esquerra(i);
+        int dret = dreta(i);
 
-          // Get the left child index
-        int left = leftChild(i);
-
-          // Get the right child index
-        int right = rightChild(i);
-
-        // If the left child is smaller than the current
-          // smallest element, update smallest
-        if (left < size && heap[left].getFrequencia() < heap[smallest].getFrequencia()) {
-            smallest = left;
+        if (esq < mida && monticle[esq].getFrequencia() < monticle[menor].getFrequencia()) {
+            menor = esq;
         }
 
-        // If the right child is smaller than the current
-          // smallest element, update smallest
-        if (right < size && heap[right].getFrequencia() < heap[smallest].getFrequencia()) {
-            smallest = right;
+        if (dret < mida && monticle[dret].getFrequencia() < monticle[menor].getFrequencia()) {
+            menor = dret;
         }
 
-        // If the smallest element is not the current
-          // element, swap and continue heapifying down
-        if (smallest != i) {
-            swap(i, smallest);
-            heapifyDown(smallest);
+        if (menor != i) {
+            intercanviar(i, menor);
+            reorganitzarAvall(menor);
         }
     }
 }

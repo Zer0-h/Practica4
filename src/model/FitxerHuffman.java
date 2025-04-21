@@ -60,7 +60,7 @@ public class FitxerHuffman {
         }
     }
 
-        public static EntradaHuffman llegirTaulaIHBits(File fitxer) throws IOException {
+    public static EntradaHuffman llegirTaulaIHBits(File fitxer) throws IOException {
         try (DataInputStream dis = new DataInputStream(new FileInputStream(fitxer))) {
             int midaTaula = dis.readInt();
             Map<String, Byte> codisInvers = new HashMap<>();

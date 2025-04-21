@@ -5,7 +5,6 @@ import controlador.Notificacio;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -73,20 +72,6 @@ public class ServeiCompressio {
         }
     }
 
-    private Map<Byte, Integer> calcularFrequencia(byte[] dades) {
-        Map<Byte, Integer> freq = new HashMap<>();
-        for (byte b : dades) {
-            freq.put(b, freq.getOrDefault(b, 0) + 1);
-        }
-        return freq;
-    }
-
-    private double calcularTaxa(File original, File comprimit) {
-        long midaOriginal = original.length();
-        long midaComprimida = comprimit.length();
-        return (1.0 - ((double) midaComprimida / midaOriginal)) * 100.0;
-    }
-
     // Reconstruir arbre
     public NodeHuffman reconstruirArbreDesDeFitxerHuff(File fitxer) throws IOException {
         EntradaHuffman entrada = FitxerHuffman.llegirTaulaIHBits(fitxer);
@@ -99,5 +84,20 @@ public class ServeiCompressio {
         }
 
         return ArbreHuffman.reconstruirDesDeCodis(codis);
+    }
+
+
+    private Map<Byte, Integer> calcularFrequencia(byte[] dades) {
+        Map<Byte, Integer> freq = new HashMap<>();
+        for (byte b : dades) {
+            freq.put(b, freq.getOrDefault(b, 0) + 1);
+        }
+        return freq;
+    }
+
+    private double calcularTaxa(File original, File comprimit) {
+        long midaOriginal = original.length();
+        long midaComprimida = comprimit.length();
+        return (1.0 - ((double) midaComprimida / midaOriginal)) * 100.0;
     }
 }

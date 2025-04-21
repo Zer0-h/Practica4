@@ -7,8 +7,8 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
-import model.cua.Cua;
-import model.cua.CuaHeap;
+import model.cua.CuaBinaryHeap;
+import model.cua.CuaPrioritat;
 
 public class ServeiCompressio {
 

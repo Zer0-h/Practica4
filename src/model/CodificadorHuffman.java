@@ -4,13 +4,13 @@ import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
-import model.cua.Cua;
+import model.cua.CuaPrioritat;
 
 public class CodificadorHuffman {
 
-    private final Cua cua;
+    private final CuaPrioritat cua;
 
-    public CodificadorHuffman(Cua c) {
+    public CodificadorHuffman(CuaPrioritat c) {
         cua = c;
     }
 

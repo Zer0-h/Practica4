@@ -3,7 +3,7 @@ package model.cua;
 import model.NodeHuffman;
 import java.util.PriorityQueue;
 
-public class CuaHeap implements Cua {
+public class CuaBinaryHeap implements CuaPrioritat {
     private final PriorityQueue<NodeHuffman> heap = new PriorityQueue<>();
 
     @Override

@@ -4,7 +4,7 @@ import model.NodeHuffman;
 
 import java.util.LinkedList;
 
-public class LlistaOrdenada implements Cua {
+public class LlistaOrdenada implements CuaPrioritat {
     private final LinkedList<NodeHuffman> llista = new LinkedList<>();
 
     @Override

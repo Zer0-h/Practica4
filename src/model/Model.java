@@ -22,12 +22,13 @@ public class Model {
         tipusCua = TipusCua.HEAP;
     }
 
-    public Cua crearCua() {
+    public CuaPrioritat crearCua() {
         return switch (tipusCua) {
-            case HEAP -> new CuaHeap();
+            case HEAP -> new CuaBinaryHeap();
+            case FIBONACCI_HEAP -> new CuaFibonacciHeap();
             case ORDENADA -> new LlistaOrdenada();
             case NO_ORDENADA -> new LlistaNoOrdenada();
-            default -> new CuaHeap();
+            default -> new CuaBinaryHeap();
         };
     }
 

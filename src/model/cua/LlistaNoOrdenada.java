@@ -4,7 +4,7 @@ import model.NodeHuffman;
 
 import java.util.ArrayList;
 
-public class LlistaNoOrdenada implements Cua {
+public class LlistaNoOrdenada implements CuaPrioritat {
     private final ArrayList<NodeHuffman> llista = new ArrayList<>();
 
     @Override

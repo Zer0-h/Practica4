@@ -5,147 +5,146 @@ import java.util.*;
 
 public class CuaFibonacciHeap implements CuaPrioritat {
 
-    private FibonacciNode minNode;
-    private int nodeCount;
+    private FibonacciNode minim;
+    private int nombreNodes;
 
     public CuaFibonacciHeap() {
-        minNode = null;
-        nodeCount = 0;
+        minim = null;
+        nombreNodes = 0;
     }
 
     @Override
     public void afegir(NodeHuffman node) {
-        FibonacciNode nouNode = new FibonacciNode(node);
-
-        if (minNode != null) {
-            addToRootList(nouNode);
-            if (node.getFrequencia() < minNode.getFrequencia()) {
-                minNode = nouNode;
+        FibonacciNode nou = new FibonacciNode(node);
+        if (minim != null) {
+            afegirALlistaArrel(nou);
+            if (node.getFrequencia() < minim.getFrequencia()) {
+                minim = nou;
             }
         } else {
-            minNode = nouNode;
+            minim = nou;
         }
-        nodeCount++;
+        nombreNodes++;
     }
 
     @Override
     public NodeHuffman extreure() {
+        if (minim == null) return null;
 
+        FibonacciNode minActual = minim;
 
-        if (minNode == null) return null;
+        // Afegim els fills del mínim a la llista d’arrels
+        if (minActual.getFill() != null) {
+            FibonacciNode fill = minActual.getFill();
+            List<FibonacciNode> fills = new ArrayList<>();
+            FibonacciNode actual = fill;
+            do {
+                fills.add(actual);
+                actual = actual.getDreta();
+            } while (actual != fill);
 
-        FibonacciNode min = minNode;
-
-        if (min.getFill() != null) {
-            // Add the children of the minNode to the root list
-            addChildrenToRootList(min);
+            for (FibonacciNode f : fills) {
+                f.setPare(null);
+                afegirALlistaArrel(f);
+            }
         }
 
-        // Remove the minNode from the root list
-        removeNodeFromRootList(min);
-        if (min == min.getDreta()) {
-            // Set minNode to null if it was the only node in the root list
-            minNode = null;
-        }
-            else {
-            minNode = min.getDreta();
-            // Consolidate the trees in the root list
-            consolidate();
-        }
-        nodeCount--;
+        eliminarDeLlistaArrel(minActual);
 
-        return min.getValor();
+        if (minActual == minActual.getDreta()) {
+            minim = null;
+        } else {
+            minim = minActual.getDreta();
+            consolidar();
+        }
+
+        nombreNodes--;
+        return minActual.getValor();
     }
 
-    private void addChildrenToRootList(FibonacciNode min) {
-        FibonacciNode child = min.getFill();
-        do {
-            FibonacciNode nextChild = child.getDreta();
-            child.setEsquerra(minNode);
-            child.setDreta(minNode.getDreta());
-            minNode.getDreta().setEsquerra(child);
-            minNode.setDreta(child);
-            child.setPare(null);
-            child = nextChild;
-        } while (child != min.getFill());
+    private void afegirALlistaArrel(FibonacciNode node) {
+        if (minim == null) {
+            node.setDreta(node);
+            node.setEsquerra(node);
+            minim = node;
+        } else {
+            node.setEsquerra(minim);
+            node.setDreta(minim.getDreta());
+            minim.getDreta().setEsquerra(node);
+            minim.setDreta(node);
+        }
     }
 
-    private void removeNodeFromRootList(FibonacciNode node) {
+    private void eliminarDeLlistaArrel(FibonacciNode node) {
         node.getEsquerra().setDreta(node.getDreta());
         node.getDreta().setEsquerra(node.getEsquerra());
     }
 
-        // Consolidate the trees in the root list
-    private void consolidate() {
-        int arraySize = ((int) Math.floor(Math.log(nodeCount) / Math.log(2.0))) + 1;
-        List<FibonacciNode> array = new ArrayList<>(Collections.nCopies(arraySize, null));
-        List<FibonacciNode> rootList = getRootList();
+    private void consolidar() {
+        int midaArray = ((int) Math.floor(Math.log(nombreNodes) / Math.log(2))) + 1;
+        List<FibonacciNode> aux = new ArrayList<>(Collections.nCopies(midaArray, null));
 
-        for (FibonacciNode node : rootList) {
-            int degree = node.getGrau();
-            while (array.get(degree) != null) {
-                FibonacciNode other = array.get(degree);
-                if (node.getFrequencia() > other.getFrequencia()) {
-                    FibonacciNode temp = node;
-                    node = other;
-                    other = temp;
-                }
+        List<FibonacciNode> llistaArrel = obtenirLlistaArrel();
 
-              	// Link two trees of the same degree
-                link(other, node);
-                array.set(degree, null);
-                degree++;
+        for (FibonacciNode node : llistaArrel) {
+            int grau = node.getGrau();
+            while (grau >= aux.size()) {
+                aux.add(null);
             }
-            array.set(degree, node);
+
+            while (aux.get(grau) != null) {
+                FibonacciNode altre = aux.get(grau);
+                if (node.getFrequencia() > altre.getFrequencia()) {
+                    FibonacciNode temp = node;
+                    node = altre;
+                    altre = temp;
+                }
+                enllaçar(altre, node);
+                aux.set(grau, null);
+                grau++;
+                while (grau >= aux.size()) {
+                    aux.add(null);
+                }
+            }
+            aux.set(grau, node);
         }
 
-        minNode = null;
-        for (FibonacciNode node : array) {
+        minim = null;
+        for (FibonacciNode node : aux) {
             if (node != null) {
-                if (minNode == null) {
-                    minNode = node;
+                if (minim == null) {
+                    node.setDreta(node);
+                    node.setEsquerra(node);
+                    minim = node;
                 } else {
-
-                    // Add the node back to the root list
-                    addToRootList(node);
-                    if (node.getFrequencia() < minNode.getFrequencia()) {
-                        minNode = node;
+                    afegirALlistaArrel(node);
+                    if (node.getFrequencia() < minim.getFrequencia()) {
+                        minim = node;
                     }
                 }
             }
         }
     }
 
-    private List<FibonacciNode> getRootList() {
-        List<FibonacciNode> root = new ArrayList<>();
-        if (minNode != null) {
-            FibonacciNode actual = minNode;
+    private List<FibonacciNode> obtenirLlistaArrel() {
+        List<FibonacciNode> llista = new ArrayList<>();
+        if (minim != null) {
+            FibonacciNode actual = minim;
             do {
-                root.add(actual);
+                llista.add(actual);
                 actual = actual.getDreta();
-            } while (actual != minNode);
+            } while (actual != minim);
         }
-        return root;
+        return llista;
     }
 
-    private void addToRootList(FibonacciNode node) {
-        node.setEsquerra(minNode);
-        node.setDreta(minNode.getDreta());
-
-        node.getDreta().setEsquerra(node);
-        minNode.setDreta(node);
-    }
-
-        // Link two trees of the same degree
-    private void link(FibonacciNode y, FibonacciNode x) {
-      	// Remove y from the root list
-        removeNodeFromRootList(y);
-        y.setEsquerra(y);
-        y.setDreta(y);
+    private void enllaçar(FibonacciNode y, FibonacciNode x) {
+        eliminarDeLlistaArrel(y);
         y.setPare(x);
 
         if (x.getFill() == null) {
-            // Make y a child of x
+            y.setDreta(y);
+            y.setEsquerra(y);
             x.setFill(y);
         } else {
             y.setDreta(x.getFill());
@@ -158,14 +157,13 @@ public class CuaFibonacciHeap implements CuaPrioritat {
         y.setMarca(false);
     }
 
-
     @Override
     public int mida() {
-        return nodeCount;
+        return nombreNodes;
     }
 
     @Override
     public boolean esBuida() {
-        return nodeCount == 0;
+        return nombreNodes == 0;
     }
 }

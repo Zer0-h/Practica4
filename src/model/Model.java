@@ -24,11 +24,11 @@ public class Model {
 
     public CuaPrioritat crearCua() {
         return switch (tipusCua) {
-            case HEAP -> new CuaBinaryHeap();
+            case HEAP -> new CuaBinaryHeap(16);
             case FIBONACCI_HEAP -> new CuaFibonacciHeap();
             case ORDENADA -> new LlistaOrdenada();
             case NO_ORDENADA -> new LlistaNoOrdenada();
-            default -> new CuaBinaryHeap();
+            default -> new CuaBinaryHeap(16);
         };
     }
 

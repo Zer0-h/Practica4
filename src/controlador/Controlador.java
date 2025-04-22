@@ -7,7 +7,7 @@ import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import model.Model;
-import model.NodeHuffman;
+import model.huffman.NodeHuffman;
 
 public class Controlador implements Notificar {
 
@@ -90,7 +90,7 @@ public class Controlador implements Notificar {
             }
 
         } catch (Exception e) {
-                                    model.setMissatge("Error durant la descompressió.");
+            model.setMissatge("Error durant la descompressió.");
             vista.notificar(Notificacio.MOSTRAR_MISSATGE);
         }
     }

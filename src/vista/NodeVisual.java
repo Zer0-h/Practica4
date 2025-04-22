@@ -1,6 +1,6 @@
 package vista;
 
-import model.NodeHuffman;
+import model.huffman.NodeHuffman;
 
 public class NodeVisual {
 

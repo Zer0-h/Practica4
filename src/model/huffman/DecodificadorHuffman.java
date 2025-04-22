@@ -1,4 +1,4 @@
-package model;
+package model.huffman;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Map;

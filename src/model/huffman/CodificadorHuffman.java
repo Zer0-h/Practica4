@@ -1,9 +1,8 @@
-package model;
+package model.huffman;
 
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.PriorityQueue;
 import model.cua.CuaPrioritat;
 
 public class CodificadorHuffman {

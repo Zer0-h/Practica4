@@ -1,4 +1,4 @@
-package model;
+package model.huffman;
 
 import java.io.*;
 import java.nio.file.Files;

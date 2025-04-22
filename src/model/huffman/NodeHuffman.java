@@ -1,4 +1,4 @@
-package model;
+package model.huffman;
 
 public class NodeHuffman implements Comparable<NodeHuffman> {
     private char simbol;

@@ -1,12 +1,8 @@
-package model;
+package model.huffman;
 
 import java.util.*;
 
 public class ArbreHuffman {
-
-    public ArbreHuffman() {
-
-    }
 
     public static NodeHuffman reconstruirDesDeCodis(Map<Byte, String> codis) {
         NodeHuffman arrel = new NodeHuffman('\0', 0);

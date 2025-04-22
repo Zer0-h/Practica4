@@ -14,11 +14,11 @@ import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ServeiCompressio {
+public class ServeiDescompressio {
 
     private final Controlador controlador;
 
-    public ServeiCompressio(Controlador c) {
+    public ServeiDescompressio(Controlador c) {
         controlador = c;
     }
 

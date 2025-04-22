@@ -1,6 +1,6 @@
 package model.cua;
 
-import model.NodeHuffman;
+import model.huffman.NodeHuffman;
 
 import java.util.ArrayList;
 

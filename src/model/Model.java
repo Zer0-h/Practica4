@@ -1,5 +1,6 @@
 package model;
 
+import model.huffman.NodeHuffman;
 import java.io.File;
 import model.cua.*;
 

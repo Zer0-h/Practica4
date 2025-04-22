@@ -1,7 +1,7 @@
 package model.cua;
 
 public enum TipusCua {
-    HEAP("Heap binari"),
+    BINARY_HEAP("Heap binari"),
     FIBONACCI_HEAP("Heap fibonacci"),
     ORDENADA("Llista ordenada"),
     NO_ORDENADA("Llista no ordenada");

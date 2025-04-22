@@ -20,12 +20,12 @@ public class Model {
     private NodeHuffman arrelHuffman;
 
     public Model() {
-        tipusCua = TipusCua.HEAP;
+        tipusCua = TipusCua.BINARY_HEAP;
     }
 
     public CuaPrioritat crearCua() {
         return switch (tipusCua) {
-            case HEAP -> new CuaBinaryHeap(16);
+            case BINARY_HEAP -> new CuaBinaryHeap(16);
             case FIBONACCI_HEAP -> new CuaFibonacciHeap();
             case ORDENADA -> new LlistaOrdenada();
             case NO_ORDENADA -> new LlistaNoOrdenada();
@@ -91,22 +91,6 @@ public class Model {
 
     public void setArrelHuffman(NodeHuffman value) {
         arrelHuffman = value;
-    }
-
-    public String getEstadistiquesFormatades() {
-        if (fitxerOriginal == null || fitxerComprès == null) return "";
-
-        return String.format("""
-            Mida comprimida: %d bytes
-            Temps de compressió: %d ms
-            Longitud mitjana del codi: %.3f bits/símbol
-            Taxa de compressió: %.2f %%
-            """,
-            fitxerComprès.length(),
-            tempsCompressioMs,
-            longitudMitjanaCodi,
-            taxaCompressio
-        );
     }
 
     public String getMissatge() { return missatgeInformatiu; }

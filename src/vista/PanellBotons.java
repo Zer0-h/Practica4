@@ -19,11 +19,11 @@ public class PanellBotons extends JPanel {
         setLayout(new FlowLayout());
 
         selectorCua = new JComboBox<>(TipusCua.values());
-        selectorCua.setSelectedItem(TipusCua.HEAP);
+        selectorCua.setSelectedItem(TipusCua.BINARY_HEAP);
         botoCarregar = new JButton("Carregar Fitxer");
         botoComprimir = new JButton("Comprimir");
-        botoDescomprimir = new JButton("Descomprimir");
         botoGuardar = new JButton("Guardar Comprimit");
+        botoDescomprimir = new JButton("Descomprimir");
 
         selectorCua.addActionListener(e -> {
             TipusCua tipus = (TipusCua) selectorCua.getSelectedItem();
@@ -31,14 +31,14 @@ public class PanellBotons extends JPanel {
         });
         botoCarregar.addActionListener(e -> controlador.notificar(Notificacio.CARREGA_FITXER));
         botoComprimir.addActionListener(e -> controlador.notificar(Notificacio.COMPRIMIR));
-        botoDescomprimir.addActionListener(e -> controlador.notificar(Notificacio.DESCOMPRIMIR));
         botoGuardar.addActionListener(e -> controlador.notificar(Notificacio.GUARDAR));
+        botoDescomprimir.addActionListener(e -> controlador.notificar(Notificacio.DESCOMPRIMIR));
 
         add(new JLabel("Tipus de cua:"));
         add(selectorCua);
         add(botoCarregar);
         add(botoComprimir);
-        add(botoDescomprimir);
         add(botoGuardar);
+        add(botoDescomprimir);
     }
 }

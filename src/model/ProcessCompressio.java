@@ -24,8 +24,6 @@ public class ProcessCompressio extends Thread {
         try {
             long inici = System.nanoTime();
 
-            Model model = controlador.getModel();
-
             // Llegir dades binàries
             byte[] dades = FitxerHuffman.llegirBytes(model.getFitxerOriginal());
 

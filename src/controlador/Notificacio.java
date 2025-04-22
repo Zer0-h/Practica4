@@ -17,4 +17,5 @@ public enum Notificacio {
     PINTAR_ARBRE,
     ERROR,
     MOSTRAR_MISSATGE,
+    ARBRE_RECONSTRUIT,
 }

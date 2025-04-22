@@ -1,16 +1,11 @@
 package model;
 
-import model.huffman.ArbreHuffman;
-import model.huffman.EntradaHuffman;
 import model.huffman.CodificadorHuffman;
 import model.huffman.NodeHuffman;
 import model.huffman.FitxerHuffman;
-import model.huffman.DecodificadorHuffman;
 import controlador.Controlador;
 import controlador.Notificacio;
-
 import java.io.*;
-import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,14 +40,13 @@ public class ProcessCompressio extends Thread {
             byte[] codificat = codificador.codificarBytes(codis, dades, padding);
 
             // Escriure fitxer .huff
-            FitxerHuffman.escriureFitxer(fitxerSortida, codis, codificat, padding[0]);
+            FitxerHuffman.escriureFitxer(model.getFitxerComprès(), codis, codificat, padding[0]);
 
             long fi = System.nanoTime();
 
             model.setArrelHuffman(arrel);
-            model.setFitxerComprès(fitxerSortida);
             model.setTempsCompressioMs((fi - inici) / 1_000_000);
-            model.setTaxaCompressio(calcularTaxa(fitxerOriginal, fitxerSortida));
+            model.setTaxaCompressio(calcularTaxa());
             model.setLongitudMitjanaCodi(codificador.calcularLongitudMitjana(freq, codis));
 
             controlador.notificar(Notificacio.COMPRESSIO_COMPLETA);
@@ -71,9 +65,9 @@ public class ProcessCompressio extends Thread {
         return freq;
     }
 
-    private double calcularTaxa(File original, File comprimit) {
-        long midaOriginal = original.length();
-        long midaComprimida = comprimit.length();
+    private double calcularTaxa() {
+        long midaOriginal = model.getFitxerOriginal().length();
+        long midaComprimida = model.getFitxerComprès().length();
         return (1.0 - ((double) midaComprimida / midaOriginal)) * 100.0;
     }
 }

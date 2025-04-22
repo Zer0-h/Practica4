@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import model.Model;
+import model.ProcessCompressio;
 import model.huffman.NodeHuffman;
 
 public class Controlador implements Notificar {
@@ -57,8 +58,9 @@ public class Controlador implements Notificar {
 
         try {
             File sortida = new File(model.getFitxerOriginal() + ".huff");
-            servei.comprimir(model.getFitxerOriginal(), sortida);
-
+            model.setFitxerComprès(sortida);
+            ProcessCompressio p = new ProcessCompressio(this);
+            p.start();
         } catch (Exception e) {
             model.setMissatge("Error durant la compressió.");
             vista.notificar(Notificacio.MOSTRAR_MISSATGE);

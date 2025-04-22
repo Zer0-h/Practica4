@@ -41,8 +41,7 @@ public class Controlador implements Notificar {
 
     private void comprimir() {
         if (model.getFitxerOriginal() == null) {
-            model.setMissatge("Primer has de carregar un fitxer per comprimir.");
-            vista.notificar(Notificacio.MOSTRAR_MISSATGE);
+            mostrarMissatge("Primer has de carregar un fitxer per comprimir.");
             return;
         }
 
@@ -52,15 +51,13 @@ public class Controlador implements Notificar {
             ProcessCompressio p = new ProcessCompressio(this);
             p.start();
         } catch (Exception e) {
-            model.setMissatge("Error durant la compressió.");
-            vista.notificar(Notificacio.MOSTRAR_MISSATGE);
+            mostrarMissatge("Error durant la compressió.");
         }
     }
 
     private void descomprimir() {
         if (model.getFitxerComprès() == null) {
-            model.setMissatge("Has de comprimir o carregar un fitxer .huff primer.");
-            vista.notificar(Notificacio.MOSTRAR_MISSATGE);
+            mostrarMissatge("Has de comprimir o carregar un fitxer .huff primer.");
             return;
         }
 
@@ -71,41 +68,23 @@ public class Controlador implements Notificar {
             ProcessDescompressio p = new ProcessDescompressio(this);
             p.start();
         } catch (Exception e) {
-            model.setMissatge("Error durant la descompressió.");
-            vista.notificar(Notificacio.MOSTRAR_MISSATGE);
+            mostrarMissatge("Error durant la descompressió.");
         }
     }
 
-    private void guardarFitxer() {
-        if (model.getFitxerComprès() == null) {
-            model.setMissatge("Cap fitxer comprimit per guardar.");
-            vista.notificar(Notificacio.MOSTRAR_MISSATGE);
-            return;
-        }
-
+    private void guardar(File origen, String nomPerDefecte) {
         JFileChooser selector = new JFileChooser();
-
-        selector.setSelectedFile(new File(model.getFitxerComprès().getName()));
-        int resultat = selector.showSaveDialog(null);
-        if (resultat == JFileChooser.APPROVE_OPTION) {
+        selector.setSelectedFile(new File(nomPerDefecte));
+        if (selector.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
             File desti = selector.getSelectedFile();
-            model.getFitxerComprès().renameTo(desti);
-            model.setMissatge("Fitxer guardat com: " + desti.getName());
-            vista.notificar(Notificacio.MOSTRAR_MISSATGE);
+            origen.renameTo(desti);
+            mostrarMissatge("Fitxer guardat com: " + desti.getName());
         }
     }
 
-    private void guardarDescomprimit() {
-        JFileChooser selector = new JFileChooser();
-
-        selector.setSelectedFile(new File(model.getFitxerDescomprès().getName()));
-        int resultat = selector.showSaveDialog(null);
-        if (resultat == JFileChooser.APPROVE_OPTION) {
-            File desti = selector.getSelectedFile();
-            model.getFitxerDescomprès().renameTo(desti);
-            model.setMissatge("Fitxer guardat com: " + desti.getName());
-            vista.notificar(Notificacio.MOSTRAR_MISSATGE);
-        }
+    private void mostrarMissatge(String text) {
+        model.setMissatge(text);
+        vista.notificar(Notificacio.MOSTRAR_MISSATGE);
     }
 
     public Model getModel() {
@@ -122,11 +101,11 @@ public class Controlador implements Notificar {
             case DESCOMPRIMIR ->
                 descomprimir();
             case GUARDAR ->
-                guardarFitxer();
+                guardar(model.getFitxerComprès(), model.getFitxerComprès().getName());
             case COMPRESSIO_COMPLETA ->
                 vista.notificar(Notificacio.PINTAR_ARBRE);
             case DESCOMPRESSIO_COMPLETA ->
-                guardarDescomprimit();
+                guardar(model.getFitxerDescomprès(), model.getFitxerDescomprès().getName());
             case ARBRE_RECONSTRUIT ->
                 vista.notificar(Notificacio.PINTAR_ARBRE);
             case ERROR ->

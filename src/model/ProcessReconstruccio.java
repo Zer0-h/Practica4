@@ -1,6 +1,5 @@
 package model;
 
-import model.huffman.CodificadorHuffman;
 import model.huffman.NodeHuffman;
 import model.huffman.FitxerHuffman;
 import controlador.Controlador;
@@ -14,16 +13,16 @@ import model.huffman.EntradaHuffman;
 public class ProcessReconstruccio extends Thread {
 
     private final Controlador controlador;
-    private final Model model;
 
     public ProcessReconstruccio(Controlador c) {
         controlador = c;
-        model = c.getModel();
     }
 
     @Override
     public void run() {
         try {
+            Model model = controlador.getModel();
+
             EntradaHuffman entrada = FitxerHuffman.llegirTaulaIHBits(model.getFitxerComprès());
             Map<String, Byte> codisInvers = entrada.getCodisInvers();
 

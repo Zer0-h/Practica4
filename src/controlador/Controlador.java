@@ -1,13 +1,19 @@
+/**
+ * Classe Controlador del patró MVC.
+ * Gestiona la comunicació entre el Model i la Vista
+ * mitjançant el patró d’esdeveniments.
+ *
+ * @author tonitorres
+ */
 package controlador;
 
-import vista.Vista;
-
-import javax.swing.*;
 import java.io.File;
+import javax.swing.*;
 import model.Model;
 import model.ProcessCompressio;
 import model.ProcessDescompressio;
 import model.ProcessReconstruccio;
+import vista.Vista;
 
 public class Controlador implements Notificar {
 
@@ -18,20 +24,27 @@ public class Controlador implements Notificar {
         new Controlador().inicialitzar();
     }
 
+    /**
+     * Inicialitza el model i la vista.
+     */
     private void inicialitzar() {
         model = new Model();
         vista = new Vista(this);
     }
 
-    private void carregaFitxer() {
+    /**
+     * Gestiona la càrrega d’un fitxer.
+     * Si és un fitxer .huff, reconstrueix l’arbre.
+     * Si és un fitxer normal, el registra com a fitxer original.
+     */
+    private void carregarFitxer() {
         JFileChooser selector = new JFileChooser();
         if (selector.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
             File fitxer = selector.getSelectedFile();
 
             if (fitxer.getName().toLowerCase().endsWith(".huff")) {
                 model.setFitxerComprès(fitxer);
-                ProcessReconstruccio p = new ProcessReconstruccio(this);
-                p.start();
+                new ProcessReconstruccio(this).start();
             } else {
                 model.setFitxerOriginal(fitxer);
                 vista.mostrarNomFitxerCarregat(fitxer.getName(), fitxer.length());
@@ -39,6 +52,9 @@ public class Controlador implements Notificar {
         }
     }
 
+    /**
+     * Inicia el procés de compressió del fitxer carregat.
+     */
     private void comprimir() {
         if (model.getFitxerOriginal() == null) {
             mostrarMissatge("Primer has de carregar un fitxer per comprimir.");
@@ -48,13 +64,15 @@ public class Controlador implements Notificar {
         try {
             File sortida = new File(model.getFitxerOriginal() + ".huff");
             model.setFitxerComprès(sortida);
-            ProcessCompressio p = new ProcessCompressio(this);
-            p.start();
+            new ProcessCompressio(this).start();
         } catch (Exception e) {
             mostrarMissatge("Error durant la compressió.");
         }
     }
 
+    /**
+     * Inicia el procés de descompressió del fitxer .huff carregat.
+     */
     private void descomprimir() {
         if (model.getFitxerComprès() == null) {
             mostrarMissatge("Has de comprimir o carregar un fitxer .huff primer.");
@@ -65,13 +83,18 @@ public class Controlador implements Notificar {
         model.setFitxerDescomprès(fitxerDescomprès);
 
         try {
-            ProcessDescompressio p = new ProcessDescompressio(this);
-            p.start();
+            new ProcessDescompressio(this).start();
         } catch (Exception e) {
             mostrarMissatge("Error durant la descompressió.");
         }
     }
 
+    /**
+     * Mostra un diàleg per guardar un fitxer.
+     *
+     * @param origen        Fitxer a guardar.
+     * @param nomPerDefecte Nom per defecte del fitxer.
+     */
     private void guardar(File origen, String nomPerDefecte) {
         JFileChooser selector = new JFileChooser();
         selector.setSelectedFile(new File(nomPerDefecte));
@@ -82,6 +105,11 @@ public class Controlador implements Notificar {
         }
     }
 
+    /**
+     * Mostra un missatge a través de la vista.
+     *
+     * @param text Missatge a mostrar.
+     */
     private void mostrarMissatge(String text) {
         model.setMissatge(text);
         vista.notificar(Notificacio.MOSTRAR_MISSATGE);
@@ -91,11 +119,16 @@ public class Controlador implements Notificar {
         return model;
     }
 
+    /**
+     * Reacciona a les notificacions rebudes segons el patró d’esdeveniments.
+     *
+     * @param notificacio Tipus d’esdeveniment.
+     */
     @Override
     public void notificar(Notificacio notificacio) {
         switch (notificacio) {
             case CARREGA_FITXER ->
-                carregaFitxer();
+                carregarFitxer();
             case COMPRIMIR ->
                 comprimir();
             case DESCOMPRIMIR ->

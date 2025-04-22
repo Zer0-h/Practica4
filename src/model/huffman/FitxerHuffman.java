@@ -5,31 +5,51 @@ import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Classe utilitària encarregada de llegir i escriure fitxers Huffman.
+ * Permet serialitzar i deserialitzar la taula de codis i les dades codificades.
+ *
+ * @author tonitorres
+ */
 public class FitxerHuffman {
 
     /**
-     * Llegeix el contingut complet d'un fitxer en format binari.
-     * @param fitxer Fixter que volem llegir.
-     * @return Array de bytes del fitxer.
-     * @throws java.io.IOException
+     * Llegeix el contingut complet d’un fitxer binari.
+     *
+     * @param fitxer Fitxer a llegir
+     *
+     * @return Array de bytes amb el contingut del fitxer
+     *
+     * @throws IOException Si hi ha algun problema de lectura
      */
     public static byte[] llegirBytes(File fitxer) throws IOException {
         return Files.readAllBytes(fitxer.toPath());
     }
 
     /**
-     * Escriu un fitxer .huff amb la taula de codis Huffman i les dades codificades.
+     * Escriu un fitxer .huff amb la taula de codis Huffman i les dades
+     * codificades.
      *
-     * @param fitxerSortida Fitxer de sortida
-     * @param codis Taula de codis: byte -> cadena binària
-     * @param dadesCodificades Dades ja codificades en forma de byte[]
-     * @param padding Nombre de bits de farciment a l’últim byte
-     * @throws java.io.IOException
+     * Format:
+     * - Enter (int) amb el nombre d’entrades a la taula
+     * - Per cada entrada:
+     * - Byte amb el símbol
+     * - Byte amb la llargada del codi
+     * - Seqüència de bytes amb el codi (zero-padded)
+     * - Byte amb el padding final
+     * - Dades codificades (byte[])
+     *
+     * @param fitxerSortida    Fitxer on escriure
+     * @param codis            Taula de codis Huffman (símbol → codi binari)
+     * @param dadesCodificades Contingut codificat en bytes
+     * @param padding          Nombre de bits de farciment a l’últim byte
+     *
+     * @throws IOException Si hi ha problemes d’escriptura
      */
     public static void escriureFitxer(File fitxerSortida,
-                                      Map<Byte, String> codis,
-                                      byte[] dadesCodificades,
-                                      int padding) throws IOException {
+            Map<Byte, String> codis,
+            byte[] dadesCodificades,
+            int padding) throws IOException {
         try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(fitxerSortida))) {
             dos.writeInt(codis.size());
 
@@ -55,11 +75,20 @@ public class FitxerHuffman {
                 }
             }
 
-            dos.writeByte(padding); // Padding final
-            dos.write(dadesCodificades); // Dades codificades reals
+            dos.writeByte(padding);                 // Bits de farciment
+            dos.write(dadesCodificades);            // Dades codificades
         }
     }
 
+    /**
+     * Llegeix un fitxer .huff i reconstrueix la taula de codis i les dades.
+     *
+     * @param fitxer Fitxer .huff
+     *
+     * @return EntradaHuffman amb la taula de codis, dades i padding
+     *
+     * @throws IOException Si hi ha algun problema de lectura
+     */
     public static EntradaHuffman llegirTaulaIHBits(File fitxer) throws IOException {
         try (DataInputStream dis = new DataInputStream(new FileInputStream(fitxer))) {
             int midaTaula = dis.readInt();

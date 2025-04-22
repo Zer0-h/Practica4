@@ -29,5 +29,16 @@
             <file>file:/C:/Users/Zer0/Documents/GitHub/Practica4/src/model/cua/CuaFibonacciHeap.java</file>
             <file>file:/C:/Users/Zer0/Documents/GitHub/Practica4/src/controlador/Notificar.java</file>
         </group>
+        <group name="Capitol 4">
+            <file>file:/Users/tonitorresescribano/NetBeansProjects/Practica4/src/controlador/Notificar.java</file>
+            <file>file:/Users/tonitorresescribano/NetBeansProjects/Practica4/src/model/Model.java</file>
+            <file>file:/Users/tonitorresescribano/NetBeansProjects/Practica4/src/model/cua/CuaFibonacciHeap.java</file>
+            <file>file:/Users/tonitorresescribano/NetBeansProjects/Practica4/src/model/cua/CuaBinaryHeap.java</file>
+            <file>file:/Users/tonitorresescribano/NetBeansProjects/Practica4/src/controlador/Notificacio.java</file>
+            <file>file:/Users/tonitorresescribano/NetBeansProjects/Practica4/src/controlador/Controlador.java</file>
+            <file>file:/Users/tonitorresescribano/NetBeansProjects/Practica4/src/model/ProcessCompressio.java</file>
+            <file>file:/Users/tonitorresescribano/NetBeansProjects/Practica4/src/model/ProcessDescompressio.java</file>
+            <file>file:/Users/tonitorresescribano/NetBeansProjects/Practica4/src/model/ProcessReconstruccio.java</file>
+        </group>
     </open-files>
 </project-private>

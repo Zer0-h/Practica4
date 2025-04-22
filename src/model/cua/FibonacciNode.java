@@ -2,6 +2,13 @@ package model.cua;
 
 import model.huffman.NodeHuffman;
 
+/**
+ * Classe que representa un node dins d'un Heap de Fibonacci.
+ * Cada node conté una referència al seu valor (NodeHuffman), així com
+ * els seus fills, pare, germans i metadades com el grau i la marca.
+ *
+ * @author tonitorres
+ */
 public class FibonacciNode {
 
     private final NodeHuffman valor;
@@ -12,6 +19,11 @@ public class FibonacciNode {
     private FibonacciNode esquerra;
     private FibonacciNode dreta;
 
+    /**
+     * Constructor que inicialitza un node individual amb enllaços circulars.
+     *
+     * @param n node Huffman a encapsular
+     */
     public FibonacciNode(NodeHuffman n) {
         valor = n;
         grau = 0;
@@ -22,10 +34,16 @@ public class FibonacciNode {
         dreta = this;
     }
 
+    /**
+     * Retorna el valor Huffman del node.
+     */
     public NodeHuffman getValor() {
         return valor;
     }
 
+    /**
+     * Retorna la freqüència associada al valor Huffman.
+     */
     public int getFrequencia() {
         return valor.getFrequencia();
     }

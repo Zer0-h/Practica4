@@ -2,14 +2,28 @@ package vista;
 
 import model.huffman.NodeHuffman;
 
+/**
+ * Representa un node visual per a la representació gràfica de l'arbre de
+ * Huffman.
+ * Conté informació sobre la posició i els fills visuals corresponents.
+ *
+ * @author tonitorres
+ */
 public class NodeVisual {
 
-    private NodeHuffman dada;
-    private int x;
-    private int y;
-    private NodeVisual esquerra;
-    private NodeVisual dreta;
+    private NodeHuffman dada;            // Dada associada (node Huffman)
+    private int x;                       // Posició X a la pantalla
+    private int y;                       // Posició Y a la pantalla
+    private NodeVisual esquerra;        // Fill visual esquerre
+    private NodeVisual dreta;           // Fill visual dret
 
+    /**
+     * Constructor del node visual.
+     *
+     * @param d Node Huffman associat
+     * @param x Posició X
+     * @param y Posició Y
+     */
     public NodeVisual(NodeHuffman d, int x, int y) {
         dada = d;
         this.x = x;

@@ -1,38 +1,47 @@
 package vista;
 
-import model.huffman.NodeHuffman;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
+import javax.swing.*;
+import model.huffman.NodeHuffman;
 
+/**
+ * Panell Swing encarregat de dibuixar visualment l'arbre de Huffman.
+ * Permet fer zoom i moure la vista arrossegant el ratolí.
+ *
+ * @author tonitorres
+ */
 public class PanellArbre extends JPanel {
 
-    private NodeVisual arrelVisual;
-    private double escala = 1.0;
-    private Point arrossegantDesDe = null;
-    private int offsetX = 0, offsetY = 0;
-    private int posicioXActual = 0;
+    private NodeVisual arrelVisual;        // Arrel visual de l’arbre
+    private double escala = 1.0;           // Escala de zoom
+    private Point arrossegantDesDe = null; // Punt d'inici d'arrossegament
+    private int offsetX = 0, offsetY = 0;  // Desplaçament de la vista
+    private int posicioXActual = 0;        // Control de posicions X durant el dibuix
 
+    /**
+     * Constructor: configura el panell, zoom i esdeveniments d’arrossegament.
+     */
     public PanellArbre() {
         setBackground(Color.WHITE);
 
-        // Zoom amb scroll
+        // Gestió del zoom amb la roda del ratolí
         addMouseWheelListener(e -> {
             escala *= (e.getWheelRotation() < 0) ? 1.1 : 0.9;
             escala = Math.max(0.1, Math.min(escala, 5.0));
             repaint();
         });
 
-        // Arrossegar
+        // Detectar l’inici de l’arrossegament
         addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 arrossegantDesDe = e.getPoint();
             }
         });
 
+        // Actualitzar la posició durant l’arrossegament
         addMouseMotionListener(new MouseMotionAdapter() {
             public void mouseDragged(MouseEvent e) {
                 if (arrossegantDesDe != null) {
@@ -47,31 +56,32 @@ public class PanellArbre extends JPanel {
         });
     }
 
+    /**
+     * Estableix un nou arbre a mostrar.
+     *
+     * @param arrel Arrel de l’arbre Huffman a visualitzar
+     */
     public void setArrel(NodeHuffman arrel) {
         posicioXActual = 0;
 
         if (arrel != null) {
             arrelVisual = construirArbreVisual(arrel, 0);
-
-            // Calcular dimensions de l’arbre
             Rectangle bounds = calcularDimensions(arrelVisual);
 
-            // Escalar i centrar
+            // Reescalar per ajustar l’arbre al panell
             int amplePanell = getWidth();
             int altPanell = getHeight();
 
-            double escalaX = amplePanell / (double) (bounds.width + 80); // + marge
+            double escalaX = amplePanell / (double) (bounds.width + 80);
             double escalaY = altPanell / (double) (bounds.height + 80);
             escala = Math.min(escalaX, escalaY) * 0.9;
 
-            // Calcular el centre real de l’arbre
+            // Centrar al panell
             double centreArbreX = (bounds.x + bounds.width / 2.0) * escala;
             double centreArbreY = (bounds.y + bounds.height / 2.0) * escala;
 
-            // Centrar-lo al mig del panell
             offsetX = (int) (getWidth() / 2 - centreArbreX);
             offsetY = (int) (getHeight() / 2 - centreArbreY);
-
         } else {
             arrelVisual = null;
             offsetX = 0;
@@ -82,6 +92,9 @@ public class PanellArbre extends JPanel {
         repaint();
     }
 
+    /**
+     * Calcula els límits del dibuix per poder ajustar-lo correctament.
+     */
     private Rectangle calcularDimensions(NodeVisual node) {
         ArrayList<Integer> xs = new ArrayList<>();
         ArrayList<Integer> ys = new ArrayList<>();
@@ -95,17 +108,26 @@ public class PanellArbre extends JPanel {
         return new Rectangle(minX, minY, maxX - minX, maxY - minY);
     }
 
+    /**
+     * Recull totes les coordenades X i Y dels nodes visuals.
+     */
     private void recollirCoordenades(NodeVisual node, ArrayList<Integer> xs, ArrayList<Integer> ys) {
-        if (node == null) return;
+        if (node == null) {
+            return;
+        }
         xs.add(node.getX());
         ys.add(node.getY());
         recollirCoordenades(node.getEsquerra(), xs, ys);
         recollirCoordenades(node.getDreta(), xs, ys);
     }
 
-
+    /**
+     * Construeix de manera recursiva l’arbre visual a partir del model Huffman.
+     */
     private NodeVisual construirArbreVisual(NodeHuffman node, int profunditat) {
-        if (node == null) return null;
+        if (node == null) {
+            return null;
+        }
 
         NodeVisual esquerra = construirArbreVisual(node.getNodeEsquerra(), profunditat + 1);
         NodeVisual dreta = construirArbreVisual(node.getNodeDreta(), profunditat + 1);
@@ -128,6 +150,9 @@ public class PanellArbre extends JPanel {
         return visual;
     }
 
+    /**
+     * Dibuixa tot el panell, incloent els nodes visuals.
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -140,25 +165,29 @@ public class PanellArbre extends JPanel {
 
             g2.translate(offsetX, offsetY);
             g2.scale(escala, escala);
-
             g2.setFont(new Font("SansSerif", Font.PLAIN, 12));
-            dibuixarNodeVisual(g2, arrelVisual);
 
+            dibuixarNodeVisual(g2, arrelVisual);
             g2.setTransform(original);
         }
     }
 
+    /**
+     * Dibuixa un node concret i les seves connexions recursivament.
+     */
     private void dibuixarNodeVisual(Graphics2D g, NodeVisual node) {
-        if (node == null) return;
+        if (node == null) {
+            return;
+        }
 
         int r = 25;
 
-        // Connexions
+        // Dibuixar connexions i etiquetes 0/1
         if (node.getEsquerra() != null) {
             g.setColor(Color.BLACK);
             g.drawLine(node.getX(), node.getY(), node.getEsquerra().getX(), node.getEsquerra().getY());
             g.drawString("0", (node.getX() + node.getEsquerra().getX()) / 2 - 10,
-                              (node.getY() + node.getEsquerra().getY()) / 2);
+                    (node.getY() + node.getEsquerra().getY()) / 2);
             dibuixarNodeVisual(g, node.getEsquerra());
         }
 
@@ -166,11 +195,11 @@ public class PanellArbre extends JPanel {
             g.setColor(Color.BLACK);
             g.drawLine(node.getX(), node.getY(), node.getDreta().getX(), node.getDreta().getY());
             g.drawString("1", (node.getX() + node.getDreta().getX()) / 2 + 5,
-                              (node.getY() + node.getDreta().getY()) / 2);
+                    (node.getY() + node.getDreta().getY()) / 2);
             dibuixarNodeVisual(g, node.getDreta());
         }
 
-        // Dibuixar el node
+        // Dibuixar el node (cercle i text)
         String text = node.getDada().esFulla()
                 ? "'" + node.getDada().getSimbol() + "':" + node.getDada().getFrequencia()
                 : String.valueOf(node.getDada().getFrequencia());
